@@ -1,6 +1,7 @@
 import uclchem
 
 # set a parameter dictionary for phase 1 collapse model
+folder='/data2/LEAPS-2024/Tutorials/examples'
 
 out_species = ["SO","CO"]
 param_dict = {
@@ -11,13 +12,13 @@ param_dict = {
     "finalTime": 1.0e6, #final time
     "rout":0.1, #radius of cloud in pc
     "baseAv":1.0, #visual extinction at cloud edge.
-    "outputFile": "./examples/test-output/static-full.dat",#full UCLCHEM output
-    "abundSaveFile": "./examples/test-output/startstatic.dat",#save final abundances to file
+    "outputFile": folder+"/test-output/static-full.dat",#full UCLCHEM output
+    "abundSaveFile": folder+"/test-output/startstatic.dat",#save final abundances to file
 }
 result = uclchem.model.cloud(param_dict=param_dict,out_species=out_species)
 print(result)
 
-result_df=uclchem.analysis.read_output_file("./examples/test-output/static-full.dat")
+result_df=uclchem.analysis.read_output_file(folder+"/test-output/static-full.dat")
 result_df.head()
 
 conservation=uclchem.analysis.check_element_conservation(result_df,element_list=["H","N","C","O","S"])
