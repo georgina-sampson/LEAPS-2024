@@ -35,12 +35,19 @@ def run_model(row):
     return result[0]#just the integer error code
 
 # The Simple Way
-# result=model_table.apply(run_model, axis=1)
+result=model_table.apply(run_model, axis=1)
 
-# The Fast Way
-def pool_func(x):
-    i,row=x
-    return run_model(row)
+# Checking Your Grid
+def element_check(output_file):
+    df=uclchem.analysis.read_output_file(output_file)
+    #get conservation values
+    conserves=uclchem.analysis.check_element_conservation(df)
+    #check if any error is greater than 1%
+    return all([float(x[:-1])<1 for x in conserves.values()])
 
-with Pool(processes=6) as pool:
-    results = pool.map(pool_func, model_table.iterrows())
+model_table["run_result"]=result
+model_table["elements_conserved"]=model_table["outputFile"].map(element_check)
+#check both conditions are met
+model_table["Successful"]=(model_table.run_result>=0) & (model_table.elements_conserved)
+
+model_table.head()
