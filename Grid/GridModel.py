@@ -3,25 +3,32 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
-def setupGrid(parameters: dict):
-    ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
-    folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
-    grid_folder = folder + 'data/'
+def setupGrid(parameters: dict, prevModel = None, folder=None):
+    if not folder:
+        ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
+        folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
+
+    phase1= False if prevModel else True
+    grid_folder = folder+'startData/' if phase1 else folder+'modelData'
 
     #meshgrid will give all combinations, then we shape into columns and put into a table
     parameterSpace = dynamicMesh(parameters)
     model_table=pd.DataFrame(parameterSpace.T, columns=parameters.keys())
 
     #keep track of where each model output will be saved and make sure that folder exists
-    model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.csv", axis=1)
+    model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
+    if phase1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
+    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key]) for key in prevModel.columns])}.dat", axis=1)
     print(f"{model_table.shape[0]} models to run")
 
-    os.makedirs(folder)
-    os.makedirs(grid_folder)
+    if not os.path.exists(folder): os.makedirs(folder)
+    if not os.path.exists(grid_folder): os.makedirs(grid_folder)
+
     with open(folder+"Params.txt", "w") as f:
+        f.write(f"Phase {1 if phase1 else 2} \n")
         for key in parameters.keys(): f.write(f"{key}: {', '.join(parameters[key])} \n")
 
-    return model_table
+    return model_table, folder
 
 def phase1(model_table):
     result = model_table.apply(run_modelCloud, axis=1)
@@ -32,14 +39,23 @@ def phase1(model_table):
     #check both conditions are met
     model_table["Successful"]=(model_table.run_result>=0) & (model_table.elements_conserved)
 
+def hotCore(model_table):
+    result = model_table.apply(run_modelHotCore, axis=1)
+
+    model_table["run_result"]=result
+    model_table["elements_conserved"]=model_table["outputFile"].map(element_check)
+
+    #check both conditions are met
+    model_table["Successful"]=(model_table.run_result>=0) & (model_table.elements_conserved)    
+
 def run_modelCloud(row):
-    #basic set of parameters we'll use for this grid. 
-    ParameterDictionary = {"endatfinaldensity":False,
-                           "freefall": False,
-                           "initialTemp": 15,
-                           "outputFile": row.outputFile,
+    ParameterDictionary = {"initialTemp": 15,
                            "finalTime":1.0e6,
-                           "baseAv":2}
+                           "baseAv":2,
+                           "endatfinaldensity":False,
+                           "freefall": True,
+                           "outputFile": row.outputFile,
+                           "abundSaveFile": row.abundSaveFile}
     
     if 'iTemp' in row: ParameterDictionary['initialTemp']=row.iTemp
     if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
@@ -47,9 +63,32 @@ def run_modelCloud(row):
     if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
     if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
     if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
+    if 'rout' in row: ParameterDictionary['rout']=row.rout
     if 'bAv' in row: ParameterDictionary['baseAv']=row.bAv
 
     result = uclchem.model.cloud(param_dict=ParameterDictionary)
+    return result[0]
+
+def run_modelHotCore(row):
+    ParameterDictionary = {"finalTime":1.0e6,
+                           "baseAv":2,
+                           "freezeFactor": 0.0,
+                           "rout": 0.5,
+                           "freefall": False,
+                           "endAtFinalDensity": False,
+                           "outputFile": row.outputFile,
+                           "abundLoadFile": row.abundSaveFile}
+    
+    if 'iTemp' in row: ParameterDictionary['initialTemp']=row.iTemp
+    if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
+    if 'fDens' in row: ParameterDictionary['finalDens']=row.fDens
+    if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
+    if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
+    if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
+    if 'rout' in row: ParameterDictionary['rout']=row.rout
+    if 'bAv' in row: ParameterDictionary['baseAv']=row.bAv
+
+    result=uclchem.model.hot_core(temp_indx=3,max_temperature=row.fTemp,param_dict=ParameterDictionary)
     return result[0]
 
 def run_modelShock(row):

@@ -2,9 +2,9 @@ import uclchem, os
 import matplotlib.pyplot as plt
 
 run='grid_2024-06-27_163339'
+phase='startData'
 
-
-folder = f'/data2/LEAPS-2024/Grid/{run}/data/'
+folder = f'/data2/LEAPS-2024/Grid/{run}/{phase}/'
 modelos = os.listdir(folder)
 
 # temporary
@@ -22,4 +22,4 @@ for i in range(len(modelos)):
                          xlim=(1e2,1e6), ylim=(1e-10,1e-2),
                          xlabel="Time / years", ylabel="Fractional Abundance")
 
-plt.show()
+plt.savefig(folder+'plot.png', bbox_inches='tight')
