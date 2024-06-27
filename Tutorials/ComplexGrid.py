@@ -43,7 +43,7 @@ def run_model(row):
                            "initialDens": row.density,
                            "initialTemp": 10.0,
                            "outputFile": row.outputFile,
-                            "abundLoadFile": f"{folder}/complex_grid_folder/starts/{row.density:.0f}.csv",
+                           "abundLoadFile": f"{folder}/complex_grid_folder/starts/{row.density:.0f}.csv",
                            "finalTime":1.0e5,
                            "abstol_factor":1e-18,
                            "reltol":1e-12,
