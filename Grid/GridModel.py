@@ -5,7 +5,7 @@ from datetime import datetime
 
 def setupGrid(parameters: dict):
     ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
-    folder = f'/data2/LEAPS-2024/grid_{ahora}/'
+    folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
     grid_folder = folder + 'data/'
 
     #meshgrid will give all combinations, then we shape into columns and put into a table
@@ -18,8 +18,8 @@ def setupGrid(parameters: dict):
 
     os.makedirs(folder)
     os.makedirs(grid_folder)
-    with open(grid_folder+"Params.txt", "w") as f:
-        for key in parameters.keys(): f.write(f'{key}: {parameters[key]}')
+    with open(folder+"Params.txt", "w") as f:
+        for key in parameters.keys(): f.write(f"{key}: {', '.join(parameters[key])} \n")
 
     return model_table
 
@@ -41,13 +41,13 @@ def run_modelCloud(row):
                            "finalTime":1.0e6,
                            "baseAv":2}
     
-    if row.iTemp: ParameterDictionary['initialTemp']=row.iTemp
-    if row.iDens: ParameterDictionary['initialDens']=row.iDens
-    if row.fDens: ParameterDictionary['finalDens']=row.fDens
-    if row.cosmicRay: ParameterDictionary['zeta']=row.cosmicRay
-    if row.interstellarRad: ParameterDictionary['radfield']=row.interstellarRad
-    if row.iTemp: ParameterDictionary['finalTime']=row.iTemp
-    if row.iTemp: ParameterDictionary['baseAv']=row.iTemp
+    if 'iTemp' in row: ParameterDictionary['initialTemp']=row.iTemp
+    if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
+    if 'fDens' in row: ParameterDictionary['finalDens']=row.fDens
+    if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
+    if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
+    if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
+    if 'bAv' in row: ParameterDictionary['baseAv']=row.bAv
 
     result = uclchem.model.cloud(param_dict=ParameterDictionary)
     return result[0]
