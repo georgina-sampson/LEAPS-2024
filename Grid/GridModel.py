@@ -39,13 +39,13 @@ def reload_stage1(gridParameters, folder):
     stage1_df, trash = setupGrid(gridParameters, folder=folder)
     return stage1_df
 
-def setupGrid(parameters: dict, prevModel = None, folder=None):
+def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder=None):
     print('setupGrid - start')
     if not folder:
         ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
         folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
 
-    stage1= True if prevModel.all(axis=None) == None else False
+    stage1= prevModel.empty == True
     grid_folder = folder+'startData/' if stage1 else folder+'modelData'
     print(f'Folder: {grid_folder}')
 
