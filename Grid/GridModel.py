@@ -5,6 +5,7 @@ from datetime import datetime
 
 def stage1(gridParameters):
     print('Stage 1 - start')
+    parmNum = len(gridParameters.keys())
     stage1_df, folder = setupGrid(gridParameters)
     print('grid setup done')
 
@@ -17,11 +18,11 @@ def stage1(gridParameters):
     #check both conditions are met
     stage1_df["Successful"]=(stage1_df.run_result>=0) & (stage1_df.elements_conserved)
     print('Stage 1 - end')
-    return stage1_df, folder
+    return stage1_df, folder, parmNum
 
-def stage2(gridParameters, tipo: str, stage1_df, folder: str):
+def stage2(gridParameters, tipo: str, stage1_df, folder: str, prevParamNum: int):
     print('Stage 2 - start')
-    stage2_df, folder = setupGrid(gridParameters, stage1_df, folder)
+    stage2_df, folder = setupGrid(gridParameters, stage1_df, folder, prevParamNum)
     print('grid setup done')
 
     if tipo == 'hot core': hotCore(stage2_df)
@@ -36,10 +37,11 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str):
 
 def reload_stage1(gridParameters, folder):
     print('reloading Phase 1 data')
+    parmNum = len(gridParameters.keys())
     stage1_df, trash = setupGrid(gridParameters, folder=folder)
-    return stage1_df
+    return stage1_df, parmNum
 
-def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder=None):
+def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder=None, prevParamNum = None):
     print('setupGrid - start')
     if not folder:
         ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
@@ -55,8 +57,8 @@ def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder
 
     #keep track of where each model output will be saved and make sure that folder exists
     model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
-    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns[:-1]])}.dat", axis=1)
-    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key.replace('fDens','iDens')]) for key in prevModel.columns[:-2]])}.dat", axis=1)
+    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns[:len(parameters.keys())]])}.dat", axis=1)
+    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key.replace('fDens','iDens')]) for key in prevModel.columns[:prevParamNum]])}.dat", axis=1)
     print(f"{model_table.shape[0]} models to run")
 
     if not os.path.exists(folder): os.makedirs(folder)
