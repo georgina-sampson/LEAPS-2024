@@ -6,7 +6,7 @@ from datetime import datetime
 def stage1(gridParameters):
     print('Stage 1 - start')
     stage1_df, folder = setupGrid(gridParameters)
-    print('grid setup')
+    print('grid setup done')
 
     print('Cloud - start')
     result = stage1_df.apply(run_modelCloud, axis=1)
@@ -22,7 +22,7 @@ def stage1(gridParameters):
 def stage2(gridParameters, tipo: str, stage1_df, folder: str):
     print('Stage 2 - start')
     stage2_df, folder = setupGrid(gridParameters, stage1_df, folder)
-    print('grid setup')
+    print('grid setup done')
 
     if tipo == 'hot core': hotCore(stage2_df)
     elif tipo == 'c shock':
@@ -125,7 +125,7 @@ def run_modelHotCore(row):
                            "freefall": False,
                            "endAtFinalDensity": False,
                            "outputFile": row.outputFile,
-                           "abundLoadFile": row.abundSaveFile}
+                           "abundLoadFile": row.abundLoadFile}
     
     if 'iTemp' in row: ParameterDictionary['initialTemp']=row.iTemp
     if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
@@ -149,7 +149,7 @@ def run_modelShock(row):
                            "freefall": False,
                            "endAtFinalDensity": False,
                            "outputFile": row.outputFile,
-                           "abundLoadFile": row.abundSaveFile,
+                           "abundLoadFile": row.abundLoadFile,
                         #    "abstol_factor":1e-18,
                         #    "reltol":1e-12
                            }
