@@ -28,7 +28,7 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str):
         dissipation_time = cShock(stage2_df)
         print(f'dissipation time: {dissipation_time}')
         with open(folder+"dissipation_time.txt", "w") as f:
-            f.write(dissipation_time)
+            f.write(str(dissipation_time))
 
     else: return TypeError
     print('Stage 2 - end')
@@ -41,7 +41,6 @@ def setupGrid(parameters: dict, prevModel = None, folder=None):
 
     stage1= False if prevModel else True
     grid_folder = folder+'startData/' if stage1 else folder+'modelData'
-    print(f"Stage {1 if stage1 else 2}")
     print(f'Folder: {grid_folder}')
 
     #meshgrid will give all combinations, then we shape into columns and put into a table
@@ -59,7 +58,7 @@ def setupGrid(parameters: dict, prevModel = None, folder=None):
 
     with open(folder+"params.txt", "w") as f:
         f.write(f"Stage {1 if stage1 else 2} \n")
-        for key in parameters.keys(): f.write(f"{key}: {', '.join(parameters[key])} \n")
+        for key in parameters.keys(): f.write(f"{key}: {', '.join([str(row) for row in parameters[key]])} \n")
 
     print('setupGrid - end')
     return model_table, folder
