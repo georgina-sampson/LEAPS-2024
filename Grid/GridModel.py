@@ -54,9 +54,10 @@ def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder
     model_table=pd.DataFrame(parameterSpace.T, columns=parameters.keys())
 
     #keep track of where each model output will be saved and make sure that folder exists
-    model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
-    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns[:-2]])}.dat", axis=1)
+    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
     else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key]) for key in prevModel.columns[:-2]])}.dat", axis=1)
+    
+    model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
     print(f"{model_table.shape[0]} models to run")
 
     if not os.path.exists(folder): os.makedirs(folder)
@@ -131,7 +132,7 @@ def run_modelHotCore(row):
     if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
     if 'fDens' in row:
         ParameterDictionary['finalDens']=row.fDens
-        ParameterDictionary['endatfinaldensity']=True
+        ParameterDictionary['endAtFinalDensity']=True
     if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
     if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
     if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
@@ -158,7 +159,7 @@ def run_modelShock(row):
     if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
     if 'fDens' in row:
         ParameterDictionary['finalDens']=row.fDens
-        ParameterDictionary['endatfinaldensity']=True
+        ParameterDictionary['endAtFinalDensity']=True
     if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
     if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
     if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
