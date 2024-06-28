@@ -3,35 +3,6 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
-def setupGrid(parameters: dict, prevModel = None, folder=None):
-    if not folder:
-        ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
-        folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
-
-    stage1= False if prevModel else True
-    grid_folder = folder+'startData/' if stage1 else folder+'modelData'
-    print(f"Stage {1 if stage1 else 2}")
-    print(f'Folder: {grid_folder}')
-
-    #meshgrid will give all combinations, then we shape into columns and put into a table
-    parameterSpace = dynamicMesh(parameters)
-    model_table=pd.DataFrame(parameterSpace.T, columns=parameters.keys())
-
-    #keep track of where each model output will be saved and make sure that folder exists
-    model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
-    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
-    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key]) for key in prevModel.columns])}.dat", axis=1)
-    print(f"{model_table.shape[0]} models to run")
-
-    if not os.path.exists(folder): os.makedirs(folder)
-    if not os.path.exists(grid_folder): os.makedirs(grid_folder)
-
-    with open(folder+"params.txt", "w") as f:
-        f.write(f"Stage {1 if stage1 else 2} \n")
-        for key in parameters.keys(): f.write(f"{key}: {', '.join(parameters[key])} \n")
-
-    return model_table, folder
-
 def stage1(gridParameters):
     print('Stage 1 - start')
     stage1_df, folder = setupGrid(gridParameters)
@@ -62,6 +33,37 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str):
     else: return TypeError
     print('Stage 2 - end')
 
+def setupGrid(parameters: dict, prevModel = None, folder=None):
+    print('setupGrid - start')
+    if not folder:
+        ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
+        folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
+
+    stage1= False if prevModel else True
+    grid_folder = folder+'startData/' if stage1 else folder+'modelData'
+    print(f"Stage {1 if stage1 else 2}")
+    print(f'Folder: {grid_folder}')
+
+    #meshgrid will give all combinations, then we shape into columns and put into a table
+    parameterSpace = dynamicMesh(parameters)
+    model_table=pd.DataFrame(parameterSpace.T, columns=parameters.keys())
+
+    #keep track of where each model output will be saved and make sure that folder exists
+    model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
+    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
+    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key]) for key in prevModel.columns])}.dat", axis=1)
+    print(f"{model_table.shape[0]} models to run")
+
+    if not os.path.exists(folder): os.makedirs(folder)
+    if not os.path.exists(grid_folder): os.makedirs(grid_folder)
+
+    with open(folder+"params.txt", "w") as f:
+        f.write(f"Stage {1 if stage1 else 2} \n")
+        for key in parameters.keys(): f.write(f"{key}: {', '.join(parameters[key])} \n")
+
+    print('setupGrid - end')
+    return model_table, folder
+
 def hotCore(model_table):
     print('Hot Core - start')
     result = model_table.apply(run_modelHotCore, axis=1)
@@ -89,6 +91,7 @@ def run_modelCloud(row):
     ParameterDictionary = {"initialTemp": 15.0,
                            "finalTime":1.0e6,
                            "baseAv":2.0,
+                           "rout": 0.5,
                            "endatfinaldensity":False,
                            "freefall": True,
                            "outputFile": row.outputFile,
@@ -176,7 +179,7 @@ def dynamicMesh(parameters: dict):
     
     if len(llaves) == 1: return np.asarray(np.meshgrid(parameters[llaves[0]])).reshape(len(llaves), -1)
     if len(llaves) == 2: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]])).reshape(len(llaves), -1)
-    if len(llaves) == 3: return np.asarray(np.meshgrid(parameters[llaves[0]]),parameters[llaves[1]],parameters[llaves[2]]).reshape(len(llaves), -1)
-    if len(llaves) == 4: return np.asarray(np.meshgrid(parameters[llaves[0]]),parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]]).reshape(len(llaves), -1)
-    if len(llaves) == 5: return np.asarray(np.meshgrid(parameters[llaves[0]]),parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]],parameters[llaves[4]]).reshape(len(llaves), -1)
-    if len(llaves) == 6: return np.asarray(np.meshgrid(parameters[llaves[0]]),parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]],parameters[llaves[4]],parameters[llaves[5]]).reshape(len(llaves), -1)
+    if len(llaves) == 3: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]],parameters[llaves[2]])).reshape(len(llaves), -1)
+    if len(llaves) == 4: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]])).reshape(len(llaves), -1)
+    if len(llaves) == 5: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]],parameters[llaves[4]])).reshape(len(llaves), -1)
+    if len(llaves) == 6: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]],parameters[llaves[4]],parameters[llaves[5]])).reshape(len(llaves), -1)
