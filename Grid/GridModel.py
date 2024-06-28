@@ -8,6 +8,7 @@ def stage1(gridParameters):
     stage1_df, folder = setupGrid(gridParameters)
     print('grid setup')
 
+    print('Cloud - start')
     result = stage1_df.apply(run_modelCloud, axis=1)
 
     stage1_df["run_result"]=result
@@ -33,13 +34,18 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str):
     else: return TypeError
     print('Stage 2 - end')
 
+def reload_stage1(gridParameters, folder):
+    print('reloading Phase 1 data')
+    stage1_df, trash = setupGrid(gridParameters, folder=folder)
+    return stage1_df
+
 def setupGrid(parameters: dict, prevModel = None, folder=None):
     print('setupGrid - start')
     if not folder:
         ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
         folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
 
-    stage1= False if prevModel else True
+    stage1= True if prevModel.all(axis=None) == None else False
     grid_folder = folder+'startData/' if stage1 else folder+'modelData'
     print(f'Folder: {grid_folder}')
 
