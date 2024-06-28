@@ -8,11 +8,11 @@ gridParameters = {'fDens':np.array([1e6,1e7,1e8]),
                   'cosmicRay': np.array([10, 1000]),
                   'interstellarRad': np.array([3, 1000])}
 
-stage1_df, folder = grid.stage1(gridParameters)
+# stage1_df, folder = grid.stage1(gridParameters)
 
 # Reload Stage 1
-# folder = '/data2/LEAPS-2024/Grid/2024-06-28_121258/'
-# stage1_df = grid.reload_stage1(gridParameters, folder)
+folder = '/data2/LEAPS-2024/Grid/2024-06-28_141556/'
+stage1_df = grid.reload_stage1(gridParameters, folder)
 
 # Hot Core
 gridParameters.update({'iDens':np.array([1e6,1e7,1e8]),
