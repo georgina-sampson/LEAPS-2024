@@ -2,6 +2,7 @@ import uclchem, os
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from time import process_time 
 
 def stage1(gridParameters):
     print('Stage 1 - start')
@@ -190,3 +191,13 @@ def dynamicMesh(parameters: dict):
     if len(llaves) == 4: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]])).reshape(len(llaves), -1)
     if len(llaves) == 5: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]],parameters[llaves[4]])).reshape(len(llaves), -1)
     if len(llaves) == 6: return np.asarray(np.meshgrid(parameters[llaves[0]],parameters[llaves[1]],parameters[llaves[2]],parameters[llaves[3]],parameters[llaves[4]],parameters[llaves[5]])).reshape(len(llaves), -1)
+
+def giveTime(t_0 = None):
+    if t_0:
+        t_f = process_time() - t_0
+        tH, tM, tS = [np.floor(t_f/3600), np.floor((t_f % 3600)/ 60), np.round((t_f % 3600) % 60, 1)]
+        tiempo = f'{tH} hours   ' if tH > 0 else ''
+        tiempo += f'{tM} minutes   ' if tM > 0 else ''
+        tiempo += f'{tS} seconds   elapsed'
+        print(tiempo)
+    else: return process_time()

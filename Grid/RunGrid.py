@@ -1,9 +1,8 @@
 import numpy as np
 import pandas as pd
 import GridModel as grid
-from time import process_time 
 
-t_start = process_time() 
+t_start = grid.giveTime() 
 # Stage 1
 # gridParameters = {'fDens':np.array([1e6,1e7,1e8]),
 gridParameters = {'fDens':np.array([1e3,1e4,1e5]),
@@ -16,7 +15,7 @@ stage1_df, folder, parmNum = grid.stage1(gridParameters)
 # folder = ''
 # stage1_df, parmNum = grid.reload_stage1(gridParameters, folder)
 
-print(process_time() - t_start, 's elapsed')
+grid.giveTime(t_start)
 
 # # Hot Core
 # gridParameters.pop('fDens')
@@ -32,4 +31,4 @@ tipo = 'c shock'
 
 # Stage 2
 dTime = grid.stage2(gridParameters, tipo, stage1_df, folder, parmNum)
-print(process_time() - t_start, 's elapsed')
+grid.giveTime(t_start)
