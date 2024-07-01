@@ -13,7 +13,7 @@ gridParameters = {'fDens':np.array([1e3,1e4,1e5]),
 stage1_df, folder, parmNum = grid.stage1(gridParameters)
 
 # # Reload Stage 1
-# folder = '/data2/LEAPS-2024/Grid/2024-06-28_141556/'
+# folder = ''
 # stage1_df, parmNum = grid.reload_stage1(gridParameters, folder)
 
 print(process_time() - t_start, 's elapsed')

@@ -167,7 +167,7 @@ def run_modelShock(row):
     if 'rout' in row: ParameterDictionary['rout']=row.rout
     if 'bAv' in row: ParameterDictionary['baseAv']=row.bAv
 
-    result = uclchem.model.cshock(shock_vel=row.shock_velocity,param_dict=ParameterDictionary)
+    result = uclchem.model.cshock(shock_vel=row.shockVel,param_dict=ParameterDictionary)
     #First check UCLCHEM's result flag to seeif it's positive, if it is return the abundances
     if result[0]>0: return result[:]
     #if not, return NaNs because model failed
