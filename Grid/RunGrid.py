@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
 import GridModel as grid
+import constants
 
 t_start = grid.giveTime() 
 # Stage 1
-# gridParameters = {'fDens':np.array([1e6,1e7,1e8]),
-gridParameters = {'fDens':np.array([1e3,1e4,1e5]),
-                  'cosmicRay': np.array([10, 1000]),
-                  'interstellarRad': np.array([3, 1000])}
+# gridParameters = {constants.FDENS: np.array([1e6,1e7,1e8]),
+gridParameters = {constants.FDENS: np.array([1e3,1e4,1e5]),
+                  constants.COSMICRAY: np.array([10, 1000]),
+                  constants.INTERSTELLARRAD: np.array([3, 1000])}
 
 stage1_df, folder, parmNum = grid.stage1(gridParameters)
 
@@ -18,16 +19,16 @@ stage1_df, folder, parmNum = grid.stage1(gridParameters)
 grid.giveTime(t_start)
 
 # # Hot Core
-# gridParameters.pop('fDens')
-# gridParameters.update({'iDens':np.array([1e6,1e7,1e8]),
-#                        'fTemp': np.array([50,100,300])})
-# tipo = 'hot core'
+# gridParameters.pop(constants.FDENS)
+# gridParameters.update({constants.IDENS: np.array([1e6,1e7,1e8]),
+#                        constants.FTEMP: np.array([50,100,300])})
+# tipo = constants.HOTCORE
 
 # C Shock
-gridParameters.pop('fDens')
-gridParameters.update({'iDens':np.array([1e3,1e4,1e5]),
-                       'shockVel': np.array([10,25,40])})
-tipo = 'c shock'
+gridParameters.pop(constants.FDENS)
+gridParameters.update({constants.IDENS: np.array([1e3,1e4,1e5]),
+                       constants.SHOCKVEL: np.array([10,25,40])})
+tipo = constants.SHOCK
 
 # Stage 2
 dTime = grid.stage2(gridParameters, tipo, stage1_df, folder, parmNum)

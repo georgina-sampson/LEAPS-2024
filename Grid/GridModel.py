@@ -1,4 +1,4 @@
-import uclchem, os
+import uclchem, os, constants
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -26,8 +26,8 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str, prevParamNum: int)
     stage2_df, folder = setupGrid(gridParameters, stage1_df, folder, prevParamNum)
     print('grid setup done')
 
-    if tipo == 'hot core': hotCore(stage2_df)
-    elif tipo == 'c shock':
+    if tipo == constants.HOTCORE: hotCore(stage2_df)
+    elif tipo == constants.SHOCK:
         dissipation_time = cShock(stage2_df)
         print(f'dissipation time: {dissipation_time}')
         with open(folder+"dissipation_time.txt", "w") as f:
@@ -37,7 +37,7 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str, prevParamNum: int)
     print('Stage 2 - end')
 
 def reload_stage1(gridParameters, folder):
-    print('reloading Phase 1 data')
+    print('reloading Stage 1 data')
     parmNum = len(gridParameters.keys())
     stage1_df, trash = setupGrid(gridParameters, folder=folder)
     return stage1_df, parmNum
@@ -59,7 +59,7 @@ def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder
     #keep track of where each model output will be saved and make sure that folder exists
     model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
     if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns[:len(parameters.keys())]])}.dat", axis=1)
-    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key.replace('fDens','iDens')]) for key in prevModel.columns[:prevParamNum]])}.dat", axis=1)
+    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key.replace(constants.FDENS,constants.IDENS)]) for key in prevModel.columns[:prevParamNum]])}.dat", axis=1)
     print(f"{model_table.shape[0]} models to run")
 
     if not os.path.exists(folder): os.makedirs(folder)
@@ -105,16 +105,16 @@ def run_modelCloud(row):
                            "outputFile": row.outputFile,
                            "abundSaveFile": row.abundSaveFile}
     
-    if 'iTemp' in row: ParameterDictionary['initialTemp']=row.iTemp
-    if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
-    if 'fDens' in row:
+    if constants.ITEMP in row: ParameterDictionary['initialTemp']=row.iTemp
+    if constants.IDENS in row: ParameterDictionary['initialDens']=row.iDens
+    if constants.FDENS in row:
         ParameterDictionary['finalDens']=row.fDens
         ParameterDictionary['endatfinaldensity']=True
-    if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
-    if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
-    if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
-    if 'rout' in row: ParameterDictionary['rout']=row.rout
-    if 'bAv' in row: ParameterDictionary['baseAv']=row.bAv
+    if constants.COSMICRAY in row: ParameterDictionary['zeta']=row.cosmicRay
+    if constants.INTERSTELLARRAD in row: ParameterDictionary['radfield']=row.interstellarRad
+    if constants.FTIME in row: ParameterDictionary['finalTime']=row.fTime
+    if constants.ROUT in row: ParameterDictionary[constants.ROUT]=row.rout
+    if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
     result = uclchem.model.cloud(param_dict=ParameterDictionary)
     return result[0]
@@ -130,16 +130,16 @@ def run_modelHotCore(row):
                            "outputFile": row.outputFile,
                            "abundLoadFile": row.abundLoadFile}
     
-    if 'iTemp' in row: ParameterDictionary['initialTemp']=row.iTemp
-    if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
-    if 'fDens' in row:
+    if constants.ITEMP in row: ParameterDictionary['initialTemp']=row.iTemp
+    if constants.IDENS in row: ParameterDictionary['initialDens']=row.iDens
+    if constants.FDENS in row:
         ParameterDictionary['finalDens']=row.fDens
         ParameterDictionary['endAtFinalDensity']=True
-    if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
-    if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
-    if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
-    if 'rout' in row: ParameterDictionary['rout']=row.rout
-    if 'bAv' in row: ParameterDictionary['baseAv']=row.bAv
+    if constants.COSMICRAY in row: ParameterDictionary['zeta']=row.cosmicRay
+    if constants.INTERSTELLARRAD in row: ParameterDictionary['radfield']=row.interstellarRad
+    if constants.FTIME in row: ParameterDictionary['finalTime']=row.fTime
+    if constants.ROUT in row: ParameterDictionary[constants.ROUT]=row.rout
+    if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
     result=uclchem.model.hot_core(temp_indx=3,max_temperature=row.fTemp,param_dict=ParameterDictionary)
     return result[0]
@@ -157,16 +157,16 @@ def run_modelShock(row):
                         #    "reltol":1e-12
                            }
     
-    if 'iTemp' in row: ParameterDictionary['initialTemp']=row.iTemp
-    if 'iDens' in row: ParameterDictionary['initialDens']=row.iDens
-    if 'fDens' in row:
+    if constants.ITEMP in row: ParameterDictionary['initialTemp']=row.iTemp
+    if constants.IDENS in row: ParameterDictionary['initialDens']=row.iDens
+    if constants.FDENS in row:
         ParameterDictionary['finalDens']=row.fDens
         ParameterDictionary['endAtFinalDensity']=True
-    if 'cosmicRay' in row: ParameterDictionary['zeta']=row.cosmicRay
-    if 'interstellarRad' in row: ParameterDictionary['radfield']=row.interstellarRad
-    if 'fTime' in row: ParameterDictionary['finalTime']=row.fTime
-    if 'rout' in row: ParameterDictionary['rout']=row.rout
-    if 'bAv' in row: ParameterDictionary['baseAv']=row.bAv
+    if constants.COSMICRAY in row: ParameterDictionary['zeta']=row.cosmicRay
+    if constants.INTERSTELLARRAD in row: ParameterDictionary['radfield']=row.interstellarRad
+    if constants.FTIME in row: ParameterDictionary['finalTime']=row.fTime
+    if constants.ROUT in row: ParameterDictionary[constants.ROUT]=row.rout
+    if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
     result = uclchem.model.cshock(shock_vel=row.shockVel,param_dict=ParameterDictionary)
     #First check UCLCHEM's result flag to seeif it's positive, if it is return the abundances
