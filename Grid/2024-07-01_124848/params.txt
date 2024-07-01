@@ -1,0 +1,5 @@
+Stage 2 
+cosmicRay: 10, 1000 
+interstellarRad: 3, 1000 
+iDens: 1000.0, 10000.0, 100000.0 
+shockVel: 10, 25, 40 
