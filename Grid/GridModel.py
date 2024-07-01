@@ -27,12 +27,7 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str, prevParamNum: int)
     print('grid setup done')
 
     if tipo == constants.HOTCORE: hotCore(stage2_df)
-    elif tipo == constants.SHOCK:
-        dissipation_time = cShock(stage2_df)
-        print(f'dissipation time: {dissipation_time}')
-        with open(folder+"dissipation_time.txt", "w") as f:
-            f.write(str(dissipation_time))
-
+    elif tipo == constants.SHOCK: cShock(stage2_df)
     else: return TypeError
     print('Stage 2 - end')
 
@@ -85,15 +80,13 @@ def hotCore(model_table):
 
 def cShock(model_table):
     print('C Shock - start')
-    result, dissipation_time = model_table.apply(run_modelShock, axis=1)
+    model_table = model_table.apply(run_modelShock, axis=1)
 
-    model_table["run_result"]=result
     model_table["elements_conserved"]=model_table["outputFile"].map(element_check)
 
     #check both conditions are met
     model_table["Successful"]=(model_table.run_result>=0) & (model_table.elements_conserved)    
     print('C Shock - end')
-    return dissipation_time
 
 def run_modelCloud(row):
     ParameterDictionary = {"initialTemp": 15.0,
@@ -168,11 +161,10 @@ def run_modelShock(row):
     if constants.ROUT in row: ParameterDictionary[constants.ROUT]=row.rout
     if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
-    result = uclchem.model.cshock(shock_vel=row.shockVel,param_dict=ParameterDictionary)
-    #First check UCLCHEM's result flag to seeif it's positive, if it is return the abundances
-    if result[0]>0: return result[:]
-    #if not, return NaNs because model failed
-    else: return([np.nan])
+    result, dissTime = uclchem.model.cshock(shock_vel=row.shockVel,param_dict=ParameterDictionary)
+    row["run_result"]=result
+    row["dissipation_time"]=dissTime
+    return row
 
 # Checking Your Grid
 def element_check(output_file):
