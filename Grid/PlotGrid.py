@@ -1,10 +1,10 @@
-import uclchem, os
+import uclchem, os, constants
 import matplotlib.pyplot as plt
 
-run='grid_2024-06-27_163339'
-phase='startData'
+run = ''
+stage = constants.PHASE2
 
-folder = f'/data2/LEAPS-2024/Grid/{run}/{phase}/'
+folder = f'/data2/LEAPS-2024/Grid/{run}/{stage}/'
 modelos = os.listdir(folder)
 
 # temporary

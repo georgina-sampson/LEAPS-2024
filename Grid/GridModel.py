@@ -26,9 +26,10 @@ def stage2(gridParameters, tipo: str, stage1_df, folder: str, prevParamNum: int)
     stage2_df, folder = setupGrid(gridParameters, stage1_df, folder, prevParamNum)
     print('grid setup done')
 
-    if tipo == constants.HOTCORE: hotCore(stage2_df)
-    elif tipo == constants.SHOCK: cShock(stage2_df)
+    if tipo == constants.HOTCORE: final_df = hotCore(stage2_df)
+    elif tipo == constants.SHOCK: final_df = cShock(stage2_df)
     else: return TypeError
+    final_df.to_csv(f'{folder}stage2_df.csv')
     print('Stage 2 - end')
 
 def reload_stage1(gridParameters, folder):
@@ -75,8 +76,9 @@ def hotCore(model_table):
     model_table["elements_conserved"]=model_table["outputFile"].map(element_check)
 
     #check both conditions are met
-    model_table["Successful"]=(model_table.run_result>=0) & (model_table.elements_conserved)    
+    model_table["Successful"]=(model_table.run_result>=0) & (model_table.elements_conserved)
     print('Hot Core - end')
+    return model_table
 
 def cShock(model_table):
     print('C Shock - start')
@@ -87,6 +89,7 @@ def cShock(model_table):
     #check both conditions are met
     model_table["Successful"]=(model_table.run_result>=0) & (model_table.elements_conserved)    
     print('C Shock - end')
+    return model_table
 
 def run_modelCloud(row):
     ParameterDictionary = {"initialTemp": 15.0,
