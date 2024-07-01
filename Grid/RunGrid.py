@@ -7,8 +7,8 @@ t_start = grid.giveTime()
 
 try:
     # Stage 1
-    # gridParameters = {constants.FDENS: np.array([1e6,1e7,1e8]),
-    gridParameters = {constants.FDENS: np.array([1e3,1e4,1e5]),
+    gridParameters = {constants.FDENS: np.array([1e6,1e7,1e8]),
+    # gridParameters = {constants.FDENS: np.array([1e3,1e4,1e5]),
                     constants.COSMICRAY: np.array([10, 1000]),
                     constants.INTERSTELLARRAD: np.array([3, 1000])}
 
@@ -20,17 +20,17 @@ try:
 
     grid.giveTime(t_start)
 
-    # # Hot Core
-    # gridParameters.pop(constants.FDENS)
-    # gridParameters.update({constants.IDENS: np.array([1e6,1e7,1e8]),
-    #                        constants.FTEMP: np.array([50,100,300])})
-    # tipo = constants.HOTCORE
-
-    # C Shock
+    # Hot Core
     gridParameters.pop(constants.FDENS)
-    gridParameters.update({constants.IDENS: np.array([1e3,1e4,1e5]),
-                        constants.SHOCKVEL: np.array([10,25,40])})
-    tipo = constants.SHOCK
+    gridParameters.update({constants.IDENS: np.array([1e6,1e7,1e8]),
+                           constants.FTEMP: np.array([50,100,300])})
+    tipo = constants.HOTCORE
+
+    # # C Shock
+    # gridParameters.pop(constants.FDENS)
+    # gridParameters.update({constants.IDENS: np.array([1e3,1e4,1e5]),
+    #                     constants.SHOCKVEL: np.array([10,25,40])})
+    # tipo = constants.SHOCK
 
     # Stage 2
     grid.stage2(gridParameters, tipo, stage1_df, folder, parmNum)
