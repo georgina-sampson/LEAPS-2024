@@ -21,17 +21,19 @@ def continuityPlot(runDict):
     fig.suptitle(runDict[2], size='large')
 
     axs[0]=uclchem.analysis.plot_species(axs[0],df,species)
-    axs[0].axvline(cambio, c='black', ls='--')
-    axs[0].set_xlim(left=df['Time'].min(), right=df['Time'].max())
+    axs[0].axvline(cambio, c='black', ls='--', alpha=0.3)
+    axs[0].set_xlim(left=cambio-1e6, right=cambio+1e6)
+    # axs[0].set_xlim(left=df['Time'].min(), right=df['Time'].max())
 
     axs[1].plot(df['Time'], df['Density'], df['Time'], df['gasTemp'], df['Time'], df['av'])
-    axs[1].axvline(cambio, c='black', ls='--')
-    axs[1].set_xlim(left=df['Time'].min(), right=df['Time'].max())
+    axs[1].axvline(cambio, c='black', ls='--', alpha=0.3)
+    axs[1].set_xlim(left=cambio-1e6, right=cambio+1e6)
+    # axs[1].set_xlim(left=df['Time'].min(), right=df['Time'].max())
 
     axs[0].legend(ncols=len(species), loc='lower left')
     axs[1].legend(['Density', 'gasTemp', 'av'])
        
-    plt.savefig(folder.format('continuityPlots')+runDict[2]+'.png', bbox_inches='tight')
+    plt.savefig(folder.format('continuityPlots/zoom')+runDict[2]+'.png', bbox_inches='tight')
 
 # stg1: dens - cosmic - ir rAD
 # stg2: cosmic - ir rAD - dens - vel
