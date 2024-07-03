@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 stage = constants.PHASE2
 
-folder = '/data2/LEAPS-2024/Grid/2024-07-01_134429/{}/'
+folder = '/data2/gsampsonolalde/LEAPS-2024/Grid/2024-07-01_134429/{}/'
 # stag1 = [f for f in os.listdir(folder.format(constants.PHASE1)) if 'startcollapse' not in f]
 stag2 = [f for f in os.listdir(folder.format(constants.PHASE2)) if 'startcollapse' not in f]
 

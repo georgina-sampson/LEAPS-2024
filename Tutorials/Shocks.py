@@ -2,7 +2,7 @@ import uclchem
 import matplotlib.pyplot as plt
 
 # set a parameter dictionary for phase 1 collapse model
-folder='/data2/LEAPS-2024/Tutorials/examples'
+folder='/data2/gsampsonolalde/LEAPS-2024/Tutorials/examples'
 param_dict = {
     "endAtFinalDensity": False,#stop at finalTime
     "freefall": True,#increase density in freefall

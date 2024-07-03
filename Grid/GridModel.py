@@ -42,7 +42,7 @@ def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder
     print('setupGrid - start')
     if not folder:
         ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
-        folder = f'/data2/LEAPS-2024/Grid/{ahora}/'
+        folder = f'/data2/gsampsonolalde/LEAPS-2024/Grid/{ahora}/'
 
     stage1= True if prevModel.empty == True else False
     grid_folder = folder+'startData/' if stage1 else folder+'modelData/'

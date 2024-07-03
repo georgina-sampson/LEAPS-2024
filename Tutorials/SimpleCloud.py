@@ -1,7 +1,7 @@
 import uclchem
 
 # set a parameter dictionary for phase 1 collapse model
-folder='/data2/LEAPS-2024/Tutorials/examples'
+folder='/data2/gsampsonolalde/LEAPS-2024/Tutorials/examples'
 
 out_species = ["SO","CO"]
 param_dict = {

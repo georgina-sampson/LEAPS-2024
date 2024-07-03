@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # Initial Conditions (Phase 1)
 
 # set a parameter dictionary for cloud collapse model
-folder='/data2/LEAPS-2024/Tutorials/examples'
+folder='/data2/gsampsonolalde/LEAPS-2024/Tutorials/examples'
 param_dict = {
     "endAtFinalDensity": False,#stop at finalTime
     "freefall": True,#increase density in freefall

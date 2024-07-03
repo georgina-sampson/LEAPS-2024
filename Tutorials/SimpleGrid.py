@@ -4,7 +4,7 @@ import pandas as pd
 from multiprocessing import Pool
 import os
 
-folder='/data2/LEAPS-2024/Tutorials'
+folder='/data2/gsampsonolalde/LEAPS-2024/Tutorials'
 # This part can be substituted with any choice of grid
 #here we just vary the density, temperature and zeta 
 temperatures = np.linspace(10, 50, 3)
