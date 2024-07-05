@@ -21,10 +21,11 @@ def makeLog(df, columns):
     return df
 
 def corrGrid(df, xaxis, yaxis, tipo: str, logxscale=False, logyscale=False):
-    if logxscale: df=makeLog(df, xaxis)
-    if logyscale: df=makeLog(df, yaxis)
+    corr_df=df.copy()
+    if logxscale: corr_df=makeLog(corr_df, xaxis)
+    if logyscale: corr_df=makeLog(corr_df, yaxis)
 
-    cor = df.loc[:,df.columns[:-1]].corr()
+    cor = corr_df.loc[:,corr_df.columns[:-1]].corr()
     cor=cor.loc[:,yaxis][len(yaxis):].dropna(how='all')
     fig = plt.figure(figsize=(8, 6))
     ax = sns.heatmap(cor, vmin=-1, vmax=1, annot=True, cmap=myCmap, linewidths=.5)
@@ -34,7 +35,7 @@ def corrGrid(df, xaxis, yaxis, tipo: str, logxscale=False, logyscale=False):
     return fig
 
 def scatterGrid(df, xaxis, yaxis, title, logxscale=False, logyscale=False):
-    fig, axs = plt.subplots(len(xaxis), len(yaxis), figsize=(len(physical)*4.5, len(species)*4))
+    fig, axs = plt.subplots(len(xaxis), len(yaxis), figsize=(len(yaxis)*4.5, len(xaxis)*4))
     fig.subplots_adjust(wspace=0.4, hspace=0.2, top=0.905)
 
     for i, spec in enumerate(xaxis):
@@ -68,11 +69,11 @@ for tipo in runs:
     df = df.loc[:,physical+species+['runName']]
     
     for logxscale, logyscale in logscales:
-        print(tipo, logxscale, logyscale, 'corr')
-        figName=folder.format('AnalysisPlots', tipo)+f"corrGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
-        with np.errstate(divide='ignore'): corrGrid(df, species, physical, tipo, logxscale, logyscale).savefig(figName, dpi=300, bbox_inches='tight')
-
         print(tipo, logxscale, logyscale, 'scatter')
         title=f"{tipo.upper()}{' log' if logxscale else ' lin'}{' log' if logyscale else ' lin'}"
         figName=folder.format('AnalysisPlots', tipo)+f"scatterGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
         scatterGrid(df, species, physical, title, logxscale=False, logyscale=False).savefig(figName, dpi=300, bbox_inches='tight')
+
+        print(tipo, logxscale, logyscale, 'corr')
+        figName=folder.format('AnalysisPlots', tipo)+f"corrGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
+        with np.errstate(divide='ignore'): corrGrid(df, species, physical, tipo, logxscale, logyscale).savefig(figName, dpi=300, bbox_inches='tight')
