@@ -26,8 +26,6 @@ def corrGrid(df, xaxis, yaxis, tipo: str, logxscale=False, logyscale=False, barr
     fig = plt.figure(figsize=(8, 6))
     ax = sns.heatmap(cor, vmin=-1, vmax=1, annot=True, cmap=myCmap, linewidths=.5)
     ax.set_title(tipo.upper())
-    if logxscale: ax.set_xlabel('log')
-    if logyscale: ax.set_ylabel('log')
     return fig
 
 def scatterGrid(df, xaxis, yaxis, title, logxscale=False, logyscale=False):
@@ -53,7 +51,7 @@ logspecies= [f'{prop}_log' for prop in species]
 runs = {constants.SHOCK: '2024-07-01_124848', constants.HOTCORE: '2024-07-01_134429'}
 logscales = [[False, False], [True, False], [False, True], [True, True]]
 
-singleAxis= False
+singleAxis= True
 
 for tipo in runs:
     physical=['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield']
