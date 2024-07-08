@@ -15,24 +15,12 @@ def makeDataframe(filePath: str, tdf):
         if prop == constants.SHOCKVEL: df[prop]=tdf.at[filePath,prop]
     return df
 
-def makeLog(df, columns):
-    for c in columns:
-        df[c]=np.log10(df[c])
-    return df
-
 def corrGrid(df, xaxis, yaxis, tipo: str, logxscale=False, logyscale=False, barrera=0, singleAxis=False):
-    corr_df=df.copy()
-
     if singleAxis:
-        if logxscale: corr_df=makeLog(corr_df, xaxis)
-
-        cor = corr_df.loc[:,corr_df.columns[:-1]].corr()
+        cor = df.loc[:,xaxis].corr()
         cor=cor[cor.abs().ge(barrera)].dropna(how='all')
     else:
-        if logxscale: corr_df=makeLog(corr_df, xaxis)
-        if logyscale: corr_df=makeLog(corr_df, yaxis)
-
-        cor = corr_df.loc[:,corr_df.columns[:-1]].corr()
+        cor = df.corr()
         cor=cor[cor.abs().ge(barrera)].loc[:,yaxis][len(yaxis):].dropna(how='all')
 
     fig = plt.figure(figsize=(8, 6))
@@ -60,12 +48,16 @@ def scatterGrid(df, xaxis, yaxis, title, logxscale=False, logyscale=False):
 
 folder = '/data2/gsampsonolalde/LEAPS-2024/Grid/{}/{}/'
 species=['#CH3OH', 'CH3OH', '@CH3OH', '#SIO', 'SIO', '@SIO']
+logspecies= [f'{prop}_log' for prop in species]
 
 runs = {constants.SHOCK: '2024-07-01_124848', constants.HOTCORE: '2024-07-01_134429'}
-logscales = [[False, False], ['log', False], [False, 'log'], ['log', 'log']]
+logscales = [[False, False], [True, False], [False, True], [True, True]]
+
+singleAxis= False
 
 for tipo in runs:
     physical=['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield']
+    logphysical= [f'{prop}_log' for prop in physical]
     if tipo == constants.SHOCK: physical.append(constants.SHOCKVEL)
     
     tdf= pd.read_csv(folder.format(runs[tipo], "stage2_df.csv")[:-1], index_col=0)
@@ -75,13 +67,21 @@ for tipo in runs:
     df=df.reset_index()
     df.pop('index')
     df = df.loc[:,physical+species+['runName']]
+    for prop in physical+species:
+        with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
     
     for logxscale, logyscale in logscales:
-        # print(tipo, logxscale, logyscale, 'scatter')
-        # title=f"{tipo.upper()}{' log' if logxscale else ' lin'}{' log' if logyscale else ' lin'}"
-        # figName=folder.format('AnalysisPlots', tipo)+f"species_scatterGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
-        # scatterGrid(df, species, species, title, logxscale=False, logyscale=False).savefig(figName, dpi=300, bbox_inches='tight')
+        print(tipo, logxscale, logyscale, 'scatter')
+        xaxis= logspecies if logxscale else species
+        if singleAxis: yaxis= logspecies if logyscale else species
+        else: yaxis= logphysical if logyscale else physical
+
+        title=f"{tipo.upper()}{' log' if logxscale else ' lin'}{' log' if logyscale else ' lin'}"
+        figName=folder.format('AnalysisPlots', tipo)+f"{'species_' if singleAxis else ''}scatterGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
+        scatterGrid(df, species, species, title, logxscale, logyscale).savefig(figName, dpi=300, bbox_inches='tight')
 
         print(tipo, logxscale, logyscale, 'corr')
-        figName=folder.format('AnalysisPlots', tipo)+f"focusedCorrGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
-        with np.errstate(divide='ignore'): corrGrid(df, species, physical, tipo, logxscale, logyscale, 0.5).savefig(figName, dpi=300, bbox_inches='tight')
+        figName=folder.format('AnalysisPlots', tipo)+f"{'species_' if singleAxis else ''}CorrGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
+        corrGrid(df.loc[:,yaxis+xaxis], xaxis, yaxis, tipo, logxscale, logyscale, 0, singleAxis).savefig(figName, dpi=300, bbox_inches='tight')
+        figName=folder.format('AnalysisPlots', tipo)+f"{'species_' if singleAxis else ''}focusedCorrGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
+        corrGrid(df.loc[:,yaxis+xaxis], xaxis, yaxis, tipo, logxscale, logyscale, 0.5, singleAxis).savefig(figName, dpi=300, bbox_inches='tight')
