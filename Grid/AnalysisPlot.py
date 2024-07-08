@@ -19,16 +19,20 @@ folder = '/data2/gsampsonolalde/LEAPS-2024/Grid/{}/{}/'
 species=['#CH3OH', 'CH3OH', '@CH3OH', '#SIO', 'SIO', '@SIO']
 runs = {constants.SHOCK: '2024-07-01_124848', constants.HOTCORE: '2024-07-01_134429'}
 
-params = {
+parametros = {
     constants.HOTCORE:{
-        'xaxis': ['@CH3OH','@CH3OH','zeta','zeta','CH3OH','gasTemp','gasTemp','gasTemp','gasTemp','gasTemp','#CH3OH','#CH3OH','#CH3OH','#CH3OH','#CH3OH','#SIO','#SIO','Time','Time','Time'],
-        'xlog': ['log','log',False,'log','log',False,False,'log','log','log','log','log','log','log','log','log','log',False,False,'log'],
-        'yaxis': ['@SIO','#SIO','@SIO','CH3OH','#SIO','SIO','#CH3OH','#SIO','@SIO','@CH3OH','#SIO','@SIO','@CH3OH','CH3OH','SIO','@SIO','SIO','#CH3OH','@CH3OH','SIO'],
-        'ylog': ['log','log',False,'log','log',False,'log','log','log',False,'log','log','log',False,'log','log','log','log','log','log']
+        'xaxis': ['@CH3OH','@CH3OH','@CH3OH','@CH3OH','@CH3OH','@SIO','@SIO','@SIO','CH3OH','CH3OH','SIO','SIO','SIO','#CH3OH','#CH3OH','#CH3OH','#CH3OH','#CH3OH','#CH3OH','#CH3OH','#SIO','#SIO','#SIO'],
+        'xlog': [True,True,True,True,False,False,True,True,True,True,False,False,True,True,True,True,False,False,True,False,True,True,True],
+        'yaxis': ['@SIO','SIO','gasTemp','#SIO','Time','zeta','gasTemp','Time','zeta','#SIO','@SIO','gasTemp','Time','@CH3OH','@SIO','CH3OH','SIO','gasTemp','#SIO','Time','@SIO','SIO','gasTemp'],
+        'ylog': [True,False,False,True,True,False,True,False,True,True,True,False,True,True,True,True,True,True,True,True,True,True,True]
     },
-    constants.SHOCK:{}
+    constants.SHOCK:{
+        'xaxis': ['@CH3OH','@CH3OH','@CH3OH','@SIO','CH3OH','CH3OH','CH3OH','CH3OH','#CH3OH','#CH3OH','#CH3OH','#CH3OH','#SIO','#SIO'],
+        'xlog': [True,True,True,True,True,False,True,True,True,True,True,True,True,True],
+        'yaxis': ['@SIO','gasTemp','#SIO','gasTemp','av','zeta','Density','SIO','@CH3OH','@SIO','gasTemp','#SIO','@SIO','gasTemp'],
+        'ylog': [True,True,True,True,True,False,True,True,True,True,True,True,True,True]
+    }
 }
-
 
 for tipo in runs:
     physical=['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield']
@@ -41,19 +45,22 @@ for tipo in runs:
     df=df.reset_index()
     df.pop('index')
     df = df.loc[:,physical+species+['runName']]
-    
-    for logxscale, logyscale in logscales:
-        fig, axs = plt.subplots(len(xaxis), len(yaxis), figsize=(len(yaxis)*4.5, len(xaxis)*4))
-        fig.subplots_adjust(wspace=0.4, hspace=0.2, top=0.905)
 
-        for i, spec in enumerate(xaxis):
-            for j, phys in enumerate(yaxis):
-                sns.scatterplot(df,x=spec,y=phys,ax=axs[i][j],
-                                hue='runName', palette='Spectral', s=10,
-                                legend= 'auto' if i==0 and j==int(np.ceil(len(yaxis)/2)-1) else None)
-                if logxscale: axs[i][j].set_xscale('log')
-                if logyscale: axs[i][j].set_yscale('log')
-                if i==0 and j==int(np.ceil(len(yaxis)/2)-1): axs[i][j].legend(loc='upper center',ncols=6, bbox_to_anchor=(0.5, 1.6))
+    params=parametros[tipo]
+    xaxis=params['xaxis']
+    xlog=params['xlog']
+    yaxis=params['yaxis']
+    ylog=params['ylog']
+    
+    for i in range(len(xaxis)):
+        fig = plt.figure(figsize=(8, 6))
+        ax = sns.scatterplot(df,x=xaxis[i],y=yaxis[i],
+                                # hue='runName', palette='Spectral', s=10,
+                                legend= 'auto')
+        if xlog: ax.set_xscale('log')
+        if ylog: ax.set_yscale('log')
         
+        figName = folder.format('AnalysisPlots', 'trial')+f"{tipo}_{xaxis[i]}_{'log' if xlog[i] else 'lin'}_{yaxis[i]}_{'log' if ylog[i] else 'lin'}.png"
         fig.suptitle(tipo, size='xx-large')
         fig.savefig(figName, dpi=300, bbox_inches='tight')
+        plt.close()
