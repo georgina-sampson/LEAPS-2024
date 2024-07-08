@@ -15,7 +15,10 @@ def makeDataframe(filePath: str, tdf):
         if prop == constants.SHOCKVEL: df[prop]=tdf.at[filePath,prop]
     return df
 
-def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0, singleAxis=False):
+def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
+    if xaxis==yaxis: singleAxis=True
+    else: singleAxis=False
+
     if singleAxis:
         cor = df.loc[:,xaxis].corr()
         cor=cor[cor.abs().ge(barrera)].dropna(how='all')
@@ -51,7 +54,7 @@ logspecies= [f'{prop}_log' for prop in species]
 runs = {constants.SHOCK: '2024-07-01_124848', constants.HOTCORE: '2024-07-01_134429'}
 logscales = [[False, False], [True, False], [False, True], [True, True]]
 
-singleAxis= False
+singleAxis= True
 
 print('singleAxis',singleAxis)
 for tipo in runs:
@@ -81,7 +84,7 @@ for tipo in runs:
 
         print(tipo, logxscale, logyscale, 'corr')
         figName=folder.format('AnalysisPlots', tipo)+f"{'species_' if singleAxis else ''}CorrGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
-        corrGrid(df, xaxis, yaxis, tipo, 0, singleAxis).savefig(figName, dpi=300, bbox_inches='tight')
+        corrGrid(df, xaxis, yaxis, tipo, 0).savefig(figName, dpi=300, bbox_inches='tight')
         figName=folder.format('AnalysisPlots', tipo)+f"{'species_' if singleAxis else ''}focusedCorrGrid{'_log' if logxscale else '_lin'}{'_log' if logyscale else '_lin'}.png"
-        corrGrid(df, xaxis, yaxis, tipo, 0.5, singleAxis).savefig(figName, dpi=300, bbox_inches='tight')
+        corrGrid(df, xaxis, yaxis, tipo, 0.5).savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
