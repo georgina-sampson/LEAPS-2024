@@ -9,6 +9,7 @@ myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
 def isValid(x, y):
     phases=['#','@','$']
     if x==y: return False
+    elif 'Time' in x or 'Time' in y: return False
     elif x.strip('#@$')==y.strip('#@$'): return True
     for sym in phases:
         if sym in x and sym in y: return True
@@ -38,21 +39,27 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
     ax.set_title(tipo.upper())
     return cor, fig
 
-def scatterGrid(df, xaxis, yaxis, tipo, nameBase, focus):
+def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focus, plotType):
     for i, phys in enumerate(xaxis):
         fig = plt.figure()
         ax=fig.add_subplot(111)
         fig.subplots_adjust(top=0.93)
 
         spec=yaxis[i]
-        figName= '_'.join([nameBase,focus,phys,spec,'.png'])
+        figName= '_'.join([nameBase,plotType,focus,phys,spec,'.png'])
 
-        ax=sns.scatterplot(df,x=phys,y=spec,
-                        hue= focus,
-                        palette='hls',
-                        linewidth=0, legend='full',
-                        alpha=0.5, s=15
-                        )
+        if plotType == constants.SCATTER:
+            ax=sns.scatterplot(df,x=phys,y=spec,
+                               hue= focus, palette='hls',
+                               linewidth=0, legend='full',
+                               alpha=0.5, s=15
+                               )
+        elif plotType == constants.BAND:
+            ax=sns.lineplot(data=df, x=phys,y=spec,
+                            hue= focus, palette='hls',
+                            errorbar=lambda x: (x.min(), x.max()),
+                            )
+        
         sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.11))
         fig.suptitle(tipo.upper())
         fig.savefig(figName, dpi=300, bbox_inches='tight')

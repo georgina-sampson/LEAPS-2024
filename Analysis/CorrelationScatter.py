@@ -43,6 +43,7 @@ for singleAxis in [True, False]:
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 
             for focusProp in constants.initparams[tipo]:
-                Plotting.scatterGrid(df, xaxis, yaxis, tipo, nameBase, focusProp)
+                for plotType in [constants.SCATTER, constants.BAND]:
+                    Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, focusProp, plotType)
 
         plt.close()
