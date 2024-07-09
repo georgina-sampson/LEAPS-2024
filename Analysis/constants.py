@@ -1,0 +1,16 @@
+SHOCK = 'c shock'
+HOTCORE = 'hot core'
+
+ITEMP = 'iTemp'
+FTEMP = 'fTemp'
+IDENS = 'iDens'
+FDENS = 'fDens'
+SHOCKVEL = 'shockVel'
+COSMICRAY = 'cosmicRay'
+INTERSTELLARRAD = 'interstellarRad'
+FTIME = 'fTime'
+ROUT = 'rout'
+BAV = 'bAv'
+
+PHASE1 = 'startData'
+PHASE2 = 'modelData'
