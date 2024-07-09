@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import constants
 
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
 
@@ -37,18 +38,20 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
     ax.set_title(tipo.upper())
     return cor, fig
 
-def scatterGrid(df, xaxis, yaxis, title, logxscale=False, logyscale=False):
-    fig, axs = plt.subplots(len(xaxis), len(yaxis), figsize=(len(yaxis)*4.5, len(xaxis)*4))
-    fig.subplots_adjust(wspace=0.4, hspace=0.2, top=0.905)
+def scatterGrid(df, xaxis, yaxis, tipo):
+    cosmicRay, interstellarRad, iDens, propio = constants.initparams[tipo]
+    for i, phys in enumerate(xaxis):
+        fig = plt.figure()
+        ax=fig.add_subplot(111)
 
-    for i, spec in enumerate(xaxis):
-        for j, phys in enumerate(yaxis):
-            sns.scatterplot(df,x=spec,y=phys,ax=axs[i][j],
-                            hue='runName', palette='Spectral', s=10,
-                            legend= 'auto' if i==0 and j==int(np.ceil(len(yaxis)/2)-1) else None)
-            if logxscale: axs[i][j].set_xscale('log')
-            if logyscale: axs[i][j].set_yscale('log')
-            if i==0 and j==int(np.ceil(len(yaxis)/2)-1): axs[i][j].legend(loc='upper center',ncols=6, bbox_to_anchor=(0.5, 1.6))
-    
-    fig.suptitle(title, size='xx-large')
-    return fig
+        spec=yaxis[i]
+        figName=tipo.upper()+phys+'_'+spec+'_'+'.png'
+
+        ax=sns.scatterplot(df,x=phys,y=spec,
+                        hue= propio, style= iDens,
+                        palette='Spectral', linewidth=0, size=15
+                        )
+        ax.legend(loc='upper right',ncols=6, bbox_to_anchor=(1, 1.1))
+        ax.set_title(tipo.upper(), loc='left')
+        fig.savefig(figName, dpi=300, bbox_inches='tight')
+        plt.close()
