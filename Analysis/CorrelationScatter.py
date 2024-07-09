@@ -23,12 +23,15 @@ for singleAxis in [True, False]:
         if singleAxis: xaxis=yaxis
         else: xaxis= [f'{prop}_log' for prop in physical[tipo]]
 
-        figName=nameBase+f"{'species_' if singleAxis else ''}scatterGrid_log_log.png"
-        Plotting.scatterGrid(df, species, species, tipo, True, True).savefig(figName, dpi=300, bbox_inches='tight')
-
         figName=nameBase+f"{'species_' if singleAxis else ''}CorrGrid_log_log.png"
-        Plotting.corrGrid(df, xaxis, yaxis, tipo, 0).savefig(figName, dpi=300, bbox_inches='tight')
+        corr, fig = Plotting.corrGrid(df, xaxis, yaxis, tipo, 0)
+        fig.savefig(figName, dpi=300, bbox_inches='tight')
+
+        xaxis, yaxis = Plotting.getCorrValues(corr, singleAxis)
 
         figName=nameBase+f"{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
         Plotting.corrGrid(df, xaxis, yaxis, tipo, 0.5).savefig(figName, dpi=300, bbox_inches='tight')
+
+        figName=nameBase+f"{'species_' if singleAxis else ''}scatterGrid_log_log.png"
+        Plotting.scatterGrid(df, xaxis, yaxis, tipo, True, True).savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
