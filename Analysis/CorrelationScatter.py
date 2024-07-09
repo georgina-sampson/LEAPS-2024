@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
+folder = '{}'
 physical = {constants.SHOCK: ['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
             constants.HOTCORE: ['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield']}
 species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
@@ -17,12 +17,14 @@ def buildDataframe(tipo):
         with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
     
     df=df.reset_index().drop(columns=['index'])
-    df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(), columns=constants.initparams[tipo]))
+    df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(),
+                            columns=constants.initparams[tipo]), rsuffix='_str')
     return df
 
 for singleAxis in [True, False]:
     print('singleAxis',singleAxis)
     for tipo in physical:
+        print(tipo)
         nameBase= folder.format('CorrelationScatterPlots/')+tipo.replace(' ','').upper()+'_'
 
         df= buildDataframe(tipo)
@@ -33,7 +35,6 @@ for singleAxis in [True, False]:
 
         figName=nameBase+f"{'species_' if singleAxis else ''}CorrGrid_log_log.png"
         corr, fig = Plotting.corrGrid(df, xaxis, yaxis, tipo, 0)
-        fig.savefig(figName, dpi=300, bbox_inches='tight')
 
         xaxis, yaxis = Plotting.getCorrValues(corr, singleAxis)
 
@@ -41,6 +42,7 @@ for singleAxis in [True, False]:
             figName=nameBase+f"{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 
-            Plotting.scatterGrid(df, xaxis, yaxis, tipo)
+            for focusProp in constants.initparams[tipo]:
+                Plotting.scatterGrid(df, xaxis, yaxis, tipo, nameBase, focusProp)
 
         plt.close()

@@ -38,20 +38,22 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
     ax.set_title(tipo.upper())
     return cor, fig
 
-def scatterGrid(df, xaxis, yaxis, tipo):
-    cosmicRay, interstellarRad, iDens, propio = constants.initparams[tipo]
+def scatterGrid(df, xaxis, yaxis, tipo, nameBase, focus):
     for i, phys in enumerate(xaxis):
         fig = plt.figure()
         ax=fig.add_subplot(111)
+        fig.subplots_adjust(top=0.93)
 
         spec=yaxis[i]
-        figName=tipo.upper()+phys+'_'+spec+'_'+'.png'
+        figName= '_'.join([nameBase,focus,phys,spec,'.png'])
 
         ax=sns.scatterplot(df,x=phys,y=spec,
-                        hue= propio, style= iDens,
-                        palette='Spectral', linewidth=0, size=15
+                        hue= focus,
+                        palette='hls',
+                        linewidth=0, legend='full',
+                        alpha=0.5, s=15
                         )
-        ax.legend(loc='upper right',ncols=6, bbox_to_anchor=(1, 1.1))
-        ax.set_title(tipo.upper(), loc='left')
+        sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.11))
+        fig.suptitle(tipo.upper())
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
