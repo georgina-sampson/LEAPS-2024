@@ -13,7 +13,8 @@ def isValid(x, y):
     elif x.strip('#@$')==y.strip('#@$'): return True
     for sym in phases:
         if sym in x and sym in y: return True
-    return False
+    
+    return True
 
 def getCorrValues(cor, singleAxis):
     corrList=[]
@@ -22,9 +23,8 @@ def getCorrValues(cor, singleAxis):
             if not np.isnan(cor.loc[i,j]) and np.abs(cor.loc[i,j])>0.5:
                 x=j.replace('_log','')
                 y=i.replace('_log','')
-                if singleAxis:
-                    if isValid(x,y): corrList.append({'x': j, 'y': i})
-                else: corrList.append({'x': j, 'y': i})
+                
+                if isValid(x,y): corrList.append({'x': j, 'y': i})
     return [row['x'] for row in corrList], [row['y'] for row in corrList]
 
 def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
