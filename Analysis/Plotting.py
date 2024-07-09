@@ -17,7 +17,7 @@ def getCorrValues(cor, singleAxis):
     corrList=[]
     for i in cor.index:
         for j in cor.columns:
-            if not np.isnan(cor.loc[i,j]) and cor.loc[i,j]>0.5:
+            if not np.isnan(cor.loc[i,j]) and np.abs(cor.loc[i,j])>0.5:
                 x=j.replace('_log','')
                 y=i.replace('_log','')
                 if singleAxis:
