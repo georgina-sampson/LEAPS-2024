@@ -4,13 +4,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-folder = '{}'
+# folder = '{}'
+folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
+
 physical = {constants.SHOCK: ['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
             constants.HOTCORE: ['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield']}
 species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
 
 def buildDataframe(tipo): 
-    df= pd.read_csv(tipo+'.csv', index_col=0)
+    df= pd.read_csv(folder.format(tipo)+'.csv', index_col=0)
 
     df = df.loc[:,physical[tipo]+species+['runName']]
     for prop in physical[tipo]+species:
@@ -42,8 +44,7 @@ for singleAxis in [True, False]:
             figName=nameBase+f"{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 
-            for focusProp in constants.initparams[tipo]:
-                for plotType in [constants.SCATTER, constants.BAND]:
-                    Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, focusProp, plotType)
+            for plotType in [constants.SCATTER, constants.BAND]:
+                Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, constants.initparams[tipo], plotType)
 
         plt.close()

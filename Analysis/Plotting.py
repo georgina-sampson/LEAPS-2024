@@ -39,28 +39,29 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
     ax.set_title(tipo.upper())
     return cor, fig
 
-def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focus, plotType):
+def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType):
     for i, phys in enumerate(xaxis):
-        fig = plt.figure()
-        ax=fig.add_subplot(111)
-        fig.subplots_adjust(top=0.93)
-
-        spec=yaxis[i]
-        figName= '_'.join([nameBase,plotType,focus,phys,spec,'.png'])
-
-        if plotType == constants.SCATTER:
-            ax=sns.scatterplot(df,x=phys,y=spec,
-                               hue= focus, palette='hls',
-                               linewidth=0, legend='full',
-                               alpha=0.5, s=15
-                               )
-        elif plotType == constants.BAND:
-            ax=sns.lineplot(data=df, x=phys,y=spec,
-                            hue= focus, palette='hls',
-                            errorbar=lambda x: (x.min(), x.max()),
-                            )
+        fig, axs = plt.subplots(1, len(focusList), figsize=(5*len(focusList),4))
+        fig.subplots_adjust(wspace=0.25,top=0.9)
         
-        sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.11))
+        spec=yaxis[i]
+        figName= '_'.join([nameBase,plotType,phys,spec])+'.png'
+
+        for j, focus in enumerate(focusList):
+            if plotType == constants.SCATTER:
+                sns.scatterplot(df,x=phys,y=spec, ax=axs[j],
+                                hue= focus, palette=sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
+                                linewidth=0, legend='full',
+                                alpha=0.75, s=15
+                                )
+            elif plotType == constants.BAND:
+                sns.lineplot(data=df, x=phys,y=spec, ax=axs[j],
+                             hue= focus, palette=sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
+                             errorbar=lambda x: (x.min(), x.max()),
+                             )
+                
+            sns.move_legend(axs[j], "upper center", bbox_to_anchor=(0.5, -0.15))
+
         fig.suptitle(tipo.upper())
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
