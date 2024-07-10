@@ -38,7 +38,7 @@ for singleAxis in [True, False]:
         figName=nameBase+f"{'species_' if singleAxis else ''}CorrGrid_log_log.png"
         corr, fig = Plotting.corrGrid(df, xaxis, yaxis, tipo, 0)
 
-        xaxis, yaxis = Plotting.getCorrValues(corr, singleAxis)
+        xaxis, yaxis = Plotting.getCorrValues(corr)
 
         if len(xaxis)>0 and len(yaxis)>0:
             figName=nameBase+f"{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
@@ -46,5 +46,7 @@ for singleAxis in [True, False]:
 
             for plotType in [constants.SCATTER, constants.BAND]:
                 Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, constants.initparams[tipo], plotType)
+
+            Plotting.jointPlot(df, xaxis, yaxis, tipo, folder.format('CorrelationScatterPlots/JointGrids/')+tipo.replace(' ','').upper()+'_')
 
         plt.close()

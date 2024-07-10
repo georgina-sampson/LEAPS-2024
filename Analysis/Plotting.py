@@ -16,7 +16,7 @@ def isValid(x, y):
     
     return True
 
-def getCorrValues(cor, singleAxis):
+def getCorrValues(cor):
     corrList=[]
     for i in cor.index:
         for j in cor.columns:
@@ -28,7 +28,11 @@ def getCorrValues(cor, singleAxis):
     return [row['x'] for row in corrList], [row['y'] for row in corrList]
 
 def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
-    if xaxis==yaxis: singleAxis=True
+    xsor= xaxis.copy()
+    ysor= yaxis.copy()
+    xsor.sort()
+    ysor.sort()
+    if xsor==ysor: singleAxis=True
     else: singleAxis=False
 
     cor = df.loc[:,xaxis if singleAxis else xaxis+yaxis].corr()
@@ -59,9 +63,24 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType):
                              hue= focus, palette=sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
                              errorbar=lambda x: (x.min(), x.max()),
                              )
-                
-            sns.move_legend(axs[j], "upper center", bbox_to_anchor=(0.5, -0.15))
+            sns.move_legend(axs[j], "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
 
         fig.suptitle(tipo.upper())
         fig.savefig(figName, dpi=300, bbox_inches='tight')
+        plt.close()
+
+def jointPlot(df, xaxis, yaxis, tipo, nameBase):
+    for i, phys in enumerate(xaxis):
+        spec=yaxis[i]
+
+        for j, focus in enumerate(constants.initparams[tipo]):
+            f = sns.jointplot(df, x=phys,y=spec,
+                            hue=focus, palette= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
+                            alpha=0.5, linewidth=0,
+                            )
+            f.plot_marginals(sns.histplot, alpha=0.5)
+            sns.move_legend(f.figure.axes[0], "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
+            
+            figName= '_'.join([nameBase,constants.JOINT,phys,spec])+'.png'
+            f.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
