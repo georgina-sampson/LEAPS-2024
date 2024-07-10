@@ -74,7 +74,7 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase):
         spec=yaxis[i]
 
         for j, focus in enumerate(constants.initparams[tipo]):
-            f = sns.jointplot(df, x=phys,y=spec,
+            f = sns.jointplot(df, x=spec,y=phys,
                             hue=focus, palette= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
                             alpha=0.5, linewidth=0,
                             )
