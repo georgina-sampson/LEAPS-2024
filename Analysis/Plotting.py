@@ -81,6 +81,6 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase):
             f.plot_marginals(sns.histplot, alpha=0.5)
             sns.move_legend(f.figure.axes[0], "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
             
-            figName= '_'.join([nameBase,constants.JOINT,phys,spec])+'.png'
+            figName= '_'.join([nameBase,constants.JOINT,focus,phys,spec])+'.png'
             f.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
