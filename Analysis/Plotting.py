@@ -56,7 +56,7 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType):
                 sns.scatterplot(df,x=phys,y=spec, ax=axs[j],
                                 hue= focus, palette=sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
                                 linewidth=0, legend='full',
-                                alpha=0.75, s=15
+                                alpha=0.5, s=15
                                 )
             elif plotType == constants.BAND:
                 sns.lineplot(data=df, x=phys,y=spec, ax=axs[j],
