@@ -7,8 +7,8 @@ import seaborn as sns
 # folder = '{}'
 folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
 
-physical = {constants.SHOCK: ['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
-            constants.HOTCORE: ['Time', 'Density', 'gasTemp', 'av', 'zeta', 'radfield']}
+physical = {constants.SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
+            constants.HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
 species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
 
 def buildDataframe(tipo): 
