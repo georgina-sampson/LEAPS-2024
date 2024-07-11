@@ -41,6 +41,7 @@ for tipo in physical:
         Plotting.timePlot(df, phys, tipo, nameBase+'physical/')
     
     for spec in yaxis:
-        Plotting.timePlot(df, spec, tipo, nameBase+'species/')
+        for focus in constants.initparams[tipo]:
+            Plotting.timePlot(df, spec, tipo, nameBase+'species/',focus)
 
     plt.close()

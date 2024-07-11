@@ -112,14 +112,15 @@ def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
             plt.close()
 
 
-def timePlot(df, prop, tipo, nameBase):
-    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.TIME,prop])+'.png'
+def timePlot(df, prop, tipo, nameBase, focus='runName'):
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.TIME, prop if focus=='runName' else f'{prop}_{focus}'])+'.png'
     
     fig, ax = plt.subplots(figsize=(7,5))
     fig.subplots_adjust(top=0.93)
     sns.lineplot(df, x='normalizedTime', y=prop, 
-                 hue='runName', palette='hls', 
-                 alpha=0.5, legend=None, ax=ax)
+                 hue=focus, palette='hls', 
+                 errorbar=lambda x: (x.min(), x.max()), ax=ax)
+    sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
     ax.set_xscale('log')
     fig.suptitle(tipo.upper())
 
