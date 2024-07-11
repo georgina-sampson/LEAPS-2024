@@ -24,7 +24,7 @@ def buildDataframe(tipo):
                             columns=constants.initparams[tipo]), rsuffix='_str')
     return df
 
-for tip in [constants.SCATTER, constants.JOINT, constants.BAND]:
+for tip in [constants.SCATTER, constants.JOINT, constants.BAND, 'contVars']:
     if not os.path.exists(nameBase+tip+'/'): os.makedirs(nameBase+tip+'/')
 
 for singleAxis in [True, False]:
@@ -51,4 +51,6 @@ for singleAxis in [True, False]:
                 Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, focusList, plotType)
 
             Plotting.jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList)
+            plt.close()
+            if singleAxis: Plotting.contScatterPlot(df, xaxis, yaxis, tipo, nameBase, [f'{prop}_log' for prop in constants.varPhys[tipo]])
             plt.close()

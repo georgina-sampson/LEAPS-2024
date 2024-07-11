@@ -93,6 +93,25 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList, contVar= '', cMap='')
             f.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
 
+def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
+    for i, phys in enumerate(xaxis):
+        spec=yaxis[i]
+        for focus in focusList:
+            figName= '_'.join([nameBase+'contVars'+'/'+tipo.replace(' ','').upper(),constants.SCATTER,focus,phys,spec])+'.png'
+            if os.path.exists(figName.replace(phys+'_'+spec,spec+'_'+phys)): continue
+            
+            fig, ax = plt.subplots(figsize=(7,5))
+            fig.subplots_adjust(top=0.93)
+            snsax= sns.scatterplot(df,x=phys,y=spec, hue= focus, palette='hsv', linewidth=0, legend=None, alpha=0.5, s=15, ax=ax)
+
+            norm = plt.Normalize(df[focus].min(), df[focus].max())
+            sm = plt.cm.ScalarMappable(cmap="hsv", norm=norm)
+            sm.set_array([])
+            snsax.figure.colorbar(sm, ax=ax, label=focus)
+            snsax.figure.savefig(figName, dpi=300, bbox_inches='tight')
+            plt.close()
+
+
 def timePlot(df, prop, tipo, nameBase):
     figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.TIME,prop])+'.png'
     
