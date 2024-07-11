@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import constants
+import constants, os
 
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
 
@@ -50,7 +50,9 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType):
         fig.subplots_adjust(wspace=0.25,top=0.9)
         
         spec=yaxis[i]
-        figName= '_'.join([nameBase+plotType+'/',tipo.replace(' ','').upper(),plotType,phys,spec])+'.png'
+
+        figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),plotType,phys,spec])+'.png'
+        if os.path.exists(figName.replace(phys+'_'+spec,spec+'_'+phys)): continue
 
         for j, focus in enumerate(focusList):
             if plotType == constants.SCATTER:
@@ -75,6 +77,9 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
         spec=yaxis[i]
 
         for j, focus in enumerate(focusList):
+            figName= '_'.join([nameBase+constants.JOINT+'/'+tipo.replace(' ','').upper(),constants.JOINT,focus,phys,spec])+'.png'
+            if os.path.exists(figName.replace(phys+'_'+spec,spec+'_'+phys)): continue
+
             f = sns.jointplot(df, x=spec,y=phys,
                             hue=focus, palette= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
                             alpha=0.5, linewidth=0,
@@ -82,11 +87,12 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
             f.plot_marginals(sns.histplot, alpha=0.5)
             sns.move_legend(f.figure.axes[0], "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
             
-            figName= '_'.join([nameBase+constants.JOINT+'/',tipo.replace(' ','').upper(),constants.JOINT,focus,phys,spec])+'.png'
             f.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
 
 def timePlot(df, prop, tipo, nameBase):
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.TIME,prop])+'.png'
+    
     fig, ax = plt.subplots(figsize=(7,5))
     fig.subplots_adjust(top=0.93)
     sns.lineplot(df, x='normalizedTime', y=prop, 
@@ -95,6 +101,5 @@ def timePlot(df, prop, tipo, nameBase):
     ax.set_xscale('log')
     fig.suptitle(tipo.upper())
 
-    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.TIME,prop])+'.png'
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()

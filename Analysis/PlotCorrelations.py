@@ -1,4 +1,4 @@
-import constants, Plotting
+import constants, Plotting, os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,6 +7,7 @@ import seaborn as sns
 # folder = '{}'
 folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
 
+nameBase= folder.format('CorrelationPlots/')
 physical = {constants.SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
             constants.HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
 species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
@@ -23,11 +24,13 @@ def buildDataframe(tipo):
                             columns=constants.initparams[tipo]), rsuffix='_str')
     return df
 
+for tip in [constants.SCATTER, constants.JOINT, constants.BAND]:
+    if not os.path.exists(nameBase+tip+'/'): os.makedirs(nameBase+tip+'/')
+
 for singleAxis in [True, False]:
     print('singleAxis',singleAxis)
     for tipo in physical:
         print(tipo)
-        nameBase= folder.format('CorrelationPlots/')
         focusList=constants.initparams[tipo]
 
         df= buildDataframe(tipo)
