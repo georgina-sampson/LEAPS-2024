@@ -36,13 +36,13 @@ for singleAxis in [True, False]:
         if singleAxis: xaxis=yaxis
         else: xaxis= [f'{prop}_log' for prop in physical[tipo]]
 
-        figName=nameBase+f"{'species_' if singleAxis else ''}CorrGrid_log_log.png"
+        figName=nameBase+tipo.replace(' ','').upper()+f"_{'species_' if singleAxis else ''}CorrGrid_log_log.png"
         corr, fig = Plotting.corrGrid(df, xaxis, yaxis, tipo, 0)
 
         xaxis, yaxis = Plotting.getCorrValues(corr)
 
         if len(xaxis)>0 and len(yaxis)>0:
-            figName=nameBase+f"{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
+            figName=nameBase+tipo.replace(' ','').upper()+f"_{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 
             for plotType in [constants.SCATTER, constants.BAND]:

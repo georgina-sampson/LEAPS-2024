@@ -85,3 +85,6 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
             figName= '_'.join([nameBase+constants.JOINT+'/',tipo.replace(' ','').upper(),constants.JOINT,focus,phys,spec])+'.png'
             f.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
+
+def timePlot(df, plotLines, tipo, nameBase):
+    return 0
