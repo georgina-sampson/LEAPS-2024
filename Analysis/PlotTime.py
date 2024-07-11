@@ -1,4 +1,4 @@
-import constants, Plotting
+import constants, Plotting, os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,6 +6,7 @@ import seaborn as sns
 
 # folder = '{}'
 folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
+nameBase= folder.format('TimePlots/')
 
 physical = {constants.SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
             constants.HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
@@ -23,9 +24,11 @@ def buildDataframe(tipo):
                             columns=constants.initparams[tipo]), rsuffix='_str')
     return df
 
+for tip in ['physical', 'species']:
+    if not os.path.exists(nameBase+tip+'/'): os.makedirs(nameBase+tip+'/')
+
 for tipo in physical:
     print(tipo)
-    nameBase= folder.format('TimePlots/')
     focusList=constants.initparams[tipo]
 
     df= buildDataframe(tipo)
@@ -36,5 +39,8 @@ for tipo in physical:
 
     for phys in xaxis:
         Plotting.timePlot(df, phys, tipo, nameBase+'physical/')
+    
+    for spec in yaxis:
+        Plotting.timePlot(df, spec, tipo, nameBase+'species/')
 
     plt.close()

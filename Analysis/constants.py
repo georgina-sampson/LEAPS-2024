@@ -20,6 +20,11 @@ initparams={
     HOTCORE: [COSMICRAY, INTERSTELLARRAD, IDENS, FTEMP],
 }
 
+varPhys={
+    SHOCK: ['gasTemp', 'av', 'Density'],
+    HOTCORE: ['gasTemp']
+}
+
 SCATTER = 'scatter'
 BAND = 'band'
 JOINT = 'joint'

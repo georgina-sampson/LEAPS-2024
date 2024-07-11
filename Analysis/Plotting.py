@@ -44,44 +44,47 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
     ax.set_title(tipo.upper())
     return cor, fig
 
-def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType):
+def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType, contVar= '', cMap=''):
     for i, phys in enumerate(xaxis):
         fig, axs = plt.subplots(1, len(focusList), figsize=(5*len(focusList),4))
         fig.subplots_adjust(wspace=0.25,top=0.9)
         
         spec=yaxis[i]
 
-        figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),plotType,phys,spec])+'.png'
+        figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper()+contVar,plotType,phys,spec])+'.png'
         if os.path.exists(figName.replace(phys+'_'+spec,spec+'_'+phys)): continue
 
         for j, focus in enumerate(focusList):
+            mycMap= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3) if cMap == '' else cMap
+            ax= axs[j] if len(focusList)>1 else axs
             if plotType == constants.SCATTER:
-                sns.scatterplot(df,x=phys,y=spec, ax=axs[j],
-                                hue= focus, palette=sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
+                sns.scatterplot(df,x=phys,y=spec, ax=ax,
+                                hue= focus, palette=mycMap,
                                 linewidth=0, legend='full',
                                 alpha=0.5, s=15
                                 )
             elif plotType == constants.BAND:
-                sns.lineplot(data=df, x=phys,y=spec, ax=axs[j],
-                             hue= focus, palette=sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
+                sns.lineplot(data=df, x=phys,y=spec, ax=ax,
+                             hue= focus, palette=mycMap,
                              errorbar=lambda x: (x.min(), x.max()),
                              )
-            sns.move_legend(axs[j], "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
+            sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
 
         fig.suptitle(tipo.upper())
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
 
-def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
+def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList, contVar= '', cMap=''):
     for i, phys in enumerate(xaxis):
         spec=yaxis[i]
 
         for j, focus in enumerate(focusList):
-            figName= '_'.join([nameBase+constants.JOINT+'/'+tipo.replace(' ','').upper(),constants.JOINT,focus,phys,spec])+'.png'
+            mycMap= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3) if cMap == '' else cMap
+            figName= '_'.join([nameBase+constants.JOINT+'/'+tipo.replace(' ','').upper()+contVar,constants.JOINT,focus,phys,spec])+'.png'
             if os.path.exists(figName.replace(phys+'_'+spec,spec+'_'+phys)): continue
 
             f = sns.jointplot(df, x=spec,y=phys,
-                            hue=focus, palette= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
+                            hue=focus, palette= mycMap,
                             alpha=0.5, linewidth=0,
                             )
             f.plot_marginals(sns.histplot, alpha=0.5)

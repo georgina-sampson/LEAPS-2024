@@ -31,8 +31,6 @@ for singleAxis in [True, False]:
     print('singleAxis',singleAxis)
     for tipo in physical:
         print(tipo)
-        focusList=constants.initparams[tipo]
-
         df= buildDataframe(tipo)
         
         yaxis= [f'{prop}_log' for prop in species]
@@ -48,9 +46,9 @@ for singleAxis in [True, False]:
             figName=nameBase+tipo.replace(' ','').upper()+f"_{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 
+            focusList = constants.initparams[tipo]
             for plotType in [constants.SCATTER, constants.BAND]:
                 Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, focusList, plotType)
 
             Plotting.jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList)
-
-        plt.close()
+            plt.close()
