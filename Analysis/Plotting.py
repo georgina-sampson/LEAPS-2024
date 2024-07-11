@@ -32,11 +32,12 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
     ysor= yaxis.copy()
     xsor.sort()
     ysor.sort()
+
     if xsor==ysor: singleAxis=True
     else: singleAxis=False
 
-    cor = df.loc[:,xaxis if singleAxis else xaxis+yaxis].corr()
-    cor=cor[cor.abs().ge(barrera)].loc[xaxis,yaxis].dropna(how='all').dropna(how='all', axis=1)
+    cor = df.loc[:,xsor if singleAxis else xsor+ysor].corr()
+    cor=cor[cor.abs().ge(barrera)].loc[xsor,ysor].dropna(how='all').dropna(how='all', axis=1)
 
     fig = plt.figure(figsize=(8, 6))
     ax = sns.heatmap(cor, vmin=-1, vmax=1, annot=True, cmap=myCmap, linewidths=.5)
@@ -49,7 +50,7 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType):
         fig.subplots_adjust(wspace=0.25,top=0.9)
         
         spec=yaxis[i]
-        figName= '_'.join([nameBase,plotType,phys,spec])+'.png'
+        figName= '_'.join([nameBase+plotType+'/',tipo.replace(' ','').upper(),plotType,phys,spec])+'.png'
 
         for j, focus in enumerate(focusList):
             if plotType == constants.SCATTER:
@@ -69,11 +70,11 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType):
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
 
-def jointPlot(df, xaxis, yaxis, tipo, nameBase):
+def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
     for i, phys in enumerate(xaxis):
         spec=yaxis[i]
 
-        for j, focus in enumerate(constants.initparams[tipo]):
+        for j, focus in enumerate(focusList):
             f = sns.jointplot(df, x=spec,y=phys,
                             hue=focus, palette= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3),
                             alpha=0.5, linewidth=0,
@@ -81,6 +82,6 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase):
             f.plot_marginals(sns.histplot, alpha=0.5)
             sns.move_legend(f.figure.axes[0], "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
             
-            figName= '_'.join([nameBase,constants.JOINT,focus,phys,spec])+'.png'
+            figName= '_'.join([nameBase+constants.JOINT+'/',tipo.replace(' ','').upper(),constants.JOINT,focus,phys,spec])+'.png'
             f.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()

@@ -27,7 +27,8 @@ for singleAxis in [True, False]:
     print('singleAxis',singleAxis)
     for tipo in physical:
         print(tipo)
-        nameBase= folder.format('CorrelationScatterPlots/')+tipo.replace(' ','').upper()+'_'
+        nameBase= folder.format('CorrelationPlots/')
+        focusList=constants.initparams[tipo]
 
         df= buildDataframe(tipo)
         
@@ -45,8 +46,8 @@ for singleAxis in [True, False]:
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 
             for plotType in [constants.SCATTER, constants.BAND]:
-                Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, constants.initparams[tipo], plotType)
+                Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase, focusList, plotType)
 
-            Plotting.jointPlot(df, xaxis, yaxis, tipo, folder.format('CorrelationScatterPlots/JointGrids/')+tipo.replace(' ','').upper()+'_')
+            Plotting.jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList)
 
         plt.close()
