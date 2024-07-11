@@ -23,3 +23,4 @@ initparams={
 SCATTER = 'scatter'
 BAND = 'band'
 JOINT = 'joint'
+TIME = 'time'

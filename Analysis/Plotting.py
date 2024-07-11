@@ -86,5 +86,15 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
             f.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
 
-def timePlot(df, plotLines, tipo, nameBase):
-    return 0
+def timePlot(df, prop, tipo, nameBase):
+    fig, ax = plt.subplots(figsize=(7,5))
+    fig.subplots_adjust(top=0.93)
+    sns.lineplot(df, x='normalizedTime', y=prop, 
+                 hue='runName', palette='hls', 
+                 alpha=0.5, legend=None, ax=ax)
+    ax.set_xscale('log')
+    fig.suptitle(tipo.upper())
+
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.TIME,prop])+'.png'
+    fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
