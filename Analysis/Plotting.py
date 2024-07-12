@@ -20,10 +20,13 @@ def buildDataframe(tipo, folder, physical, species):
                             columns=constants.initparams[tipo]), rsuffix='_str')
     return df
 
-def finalAbundanceDataframe(df, especies):
-    dfFinal=df.loc[df['normalizedTime'] == 1]
+def localAbundanceDataframe(df, especies, physical, tipo, momento=constants.FINAL):
+    if momento == constants.FINAL:
+        dfFinal=df.loc[df['normalizedTime'] == 1]
+    elif momento == constants.TMAX:
+        dfFinal=df.loc[df['gasTemp'] == df.groupby('runName')['gasTemp'].transform('max')]
 
-    campos=['runName', 'Density_log', 'gasTemp_log', 'av_log', 'zeta_log', 'radfield_log', 'cosmicRay', 'interstellarRad', 'iDens', 'fTemp', 'normalizedTime']
+    campos=['runName','normalizedTime']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
 
     tDic=dict([(key, []) for key in campos+['abundance_log', 'species']])
     for i in dfFinal.index:
@@ -167,8 +170,8 @@ def timePlot(df, prop, tipo, nameBase, plotType=constants.BAND, focus='runName')
     plt.close()
 
 
-def finalAbundancePlot(df, phys, tipo, nameBase):
-    figName= '_'.join([nameBase+'/'+tipo.replace(' ','').upper(),constants.ABUNDANCE, phys])+'.png'
+def localAbundancePlot(df, phys, tipo, nameBase, momento=constants.FINAL):
+    figName= '_'.join([nameBase+'/'+tipo.replace(' ','').upper(),constants.ABUNDANCE, momento, phys])+'.png'
     
     fig, ax = plt.subplots(figsize=(7,5))
     fig.subplots_adjust(top=0.93)
@@ -177,7 +180,7 @@ def finalAbundancePlot(df, phys, tipo, nameBase):
                 linewidth=0, ax=ax, alpha=0.5,
                 )
     sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.15), ncol=4)
-    fig.suptitle(tipo.upper()+': Final Abundances')
+    fig.suptitle(tipo.upper()+f': {momento} Abundances')
 
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
