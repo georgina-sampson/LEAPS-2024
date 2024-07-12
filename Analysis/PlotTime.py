@@ -12,26 +12,16 @@ physical = {constants.SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', co
             constants.HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
 species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
 
-def buildDataframe(tipo): 
-    df= pd.read_csv(folder.format(tipo)+'.csv', index_col=0)
 
-    df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
-    for prop in physical[tipo]+species:
-        with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
-    
-    df=df.reset_index().drop(columns=['index'])
-    df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(),
-                            columns=constants.initparams[tipo]), rsuffix='_str')
-    return df
-
-for tip in ['physical', 'physical/'+constants.BAND, 'species', 'species/'+constants.SCATTER]:
-    if not os.path.exists(nameBase+tip+'/'): os.makedirs(nameBase+tip+'/')
+for tip in [constants.BAND, constants.SCATTER]:
+    if not os.path.exists(nameBase+'/species/'+tip+'/'): os.makedirs(nameBase+'/species/'+tip+'/')
+    if not os.path.exists(nameBase+'/physical/'+tip+'/'): os.makedirs(nameBase+'/physical/'+tip+'/')
 
 for tipo in physical:
     print(tipo)
     focusList=constants.initparams[tipo]
 
-    df= buildDataframe(tipo)
+    df= Plotting.buildDataframe(tipo, folder, physical, species)
     df['normalizedTime']= df['Time']/df.groupby('runName')['Time'].transform('max')
  
     yaxis= [f'{prop}_log' for prop in species]

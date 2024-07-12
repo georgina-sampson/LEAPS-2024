@@ -6,6 +6,35 @@ import constants, os
 
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
 
+def buildDataframe(tipo, folder, physical, species): 
+    df= pd.read_csv(folder.format(tipo)+'.csv', index_col=0)
+
+    df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
+    df[species] = df[species][df[species] >= 1e-14]
+
+    for prop in physical[tipo]+species:
+        with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
+    
+    df=df.reset_index().drop(columns=['index'])
+    df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(),
+                            columns=constants.initparams[tipo]), rsuffix='_str')
+    return df
+
+def finalAbundanceDataframe(df, especies):
+    dfFinal=df.loc[df['normalizedTime'] == 1]
+
+    campos=['runName', 'Density_log', 'gasTemp_log', 'av_log', 'zeta_log', 'radfield_log', 'cosmicRay', 'interstellarRad', 'iDens', 'fTemp', 'normalizedTime']
+
+    tDic=dict([(key, []) for key in campos+['abundance_log', 'species']])
+    for i in dfFinal.index:
+        for spec in especies:
+            tDic['abundance_log'].append(dfFinal.at[i,spec]) 
+            tDic['species'].append(spec)
+            for c in campos:
+                tDic[c].append(dfFinal.at[i,c])
+    return pd.DataFrame(tDic)
+
+
 def isValid(x, y):
     phases=['#','@','$']
     if x==y: return False
@@ -130,6 +159,7 @@ def timePlot(df, prop, tipo, nameBase, plotType=constants.BAND, focus='runName')
                         )
         
     sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
+    ax.set_xscale('log')
     ax.set_xlim(right=1.1)
     fig.suptitle(tipo.upper())
 
