@@ -24,7 +24,7 @@ def buildDataframe(tipo):
                             columns=constants.initparams[tipo]), rsuffix='_str')
     return df
 
-for tip in ['physical', 'species']:
+for tip in ['physical', 'physical/'+constants.BAND, 'species', 'species/'+constants.SCATTER]:
     if not os.path.exists(nameBase+tip+'/'): os.makedirs(nameBase+tip+'/')
 
 for tipo in physical:
@@ -42,6 +42,6 @@ for tipo in physical:
     
     for spec in yaxis:
         for focus in constants.initparams[tipo]:
-            Plotting.timePlot(df, spec, tipo, nameBase+'species/',focus)
+            Plotting.timePlot(df, spec, tipo, nameBase+'species/', constants.SCATTER, focus)
 
     plt.close()
