@@ -6,19 +6,29 @@ import constants, os
 
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
 
-def buildDataframe(tipo, folder, physical, species): 
-    df= pd.read_csv(folder.format(tipo)+'.csv', index_col=0)
-
-    df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
-    df[species] = df[species][df[species] >= 1e-14]
-
-    for prop in physical[tipo]+species:
-        with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
+def buildDataframe(tipos, folder, physical, species, singleDf=True):
+    if singleDf: tipos=[tipos]
+    else: dflist=[]
     
-    df=df.reset_index().drop(columns=['index'])
-    df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(),
-                            columns=constants.initparams[tipo]), rsuffix='_str')
-    return df
+    for tipo in tipos:
+        df= pd.read_csv(folder.format(tipo)+'.csv', index_col=0)
+
+        df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
+        df[species] = df[species][df[species] >= 1e-14]
+
+        for prop in ['Time']+physical[tipo]+species:
+            with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
+        
+        df=df.reset_index().drop(columns=['index'])
+        df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(),
+                                columns=constants.initparams[tipo]), rsuffix='_str')
+        if singleDf:
+            return df
+        else:
+            df['tipo']=tipo
+            dflist.append(df.copy())
+    
+    return pd.concat(dflist, ignore_index=True)
 
 def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL):
     if momento == constants.FINAL:
@@ -29,8 +39,10 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
         dfFinal=df.loc[df['gasTemp'] > 15].groupby(['runName']+constants.initparams[tipo],as_index=False)[['normalizedTime']+physical[tipo]+species].mean()
         for prop in physical[tipo]+species:
             with np.errstate(divide='ignore'): dfFinal[f'{prop}_log']=np.log10(dfFinal[prop])
+    elif momento == constants.ALL:
+        dfFinal=df
 
-    campos=['runName','normalizedTime']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
+    campos=['runName','normalizedTime','Time']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
     especies=[prop+'_log' for prop in species]
 
     tDic=dict([(key, []) for key in campos+['abundance_log', 'species']])
