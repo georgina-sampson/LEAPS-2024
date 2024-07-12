@@ -22,15 +22,17 @@ for tipo in physical:
     df= Plotting.buildDataframe(tipo, folder, physical, species)
     df['normalizedTime']= df['Time']/df.groupby('runName')['Time'].transform('max')
 
-    dfFinal= Plotting.localAbundanceDataframe(df, [f'{prop}_log' for prop in species], physical, tipo)
+    dfFinal= Plotting.localAbundanceDataframe(df, species, physical, tipo)
     
     logPhysical= [f'{prop}_log' for prop in physical[tipo]]
 
     for phys in logPhysical+['species']:
         Plotting.localAbundancePlot(dfFinal, phys, tipo, nameBase)
 
-    if tipo == constants.SHOCK:
-        dfFinal= Plotting.localAbundanceDataframe(df, [f'{prop}_log' for prop in species], physical, tipo, constants.TMAX)
-        Plotting.localAbundancePlot(dfFinal, phys, tipo, nameBase, constants.TMAX)
+        if tipo == constants.SHOCK:
+            dfFinal= Plotting.localAbundanceDataframe(df, species, physical, tipo, constants.TMAX)
+            Plotting.localAbundancePlot(dfFinal, phys, tipo, nameBase, constants.TMAX)
+            dfFinal= Plotting.localAbundanceDataframe(df, species, physical, tipo, constants.SHOCKAVG)
+            Plotting.localAbundancePlot(dfFinal, phys, tipo, nameBase, constants.SHOCKAVG)
 
     plt.close()

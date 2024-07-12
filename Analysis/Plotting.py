@@ -20,13 +20,18 @@ def buildDataframe(tipo, folder, physical, species):
                             columns=constants.initparams[tipo]), rsuffix='_str')
     return df
 
-def localAbundanceDataframe(df, especies, physical, tipo, momento=constants.FINAL):
+def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL):
     if momento == constants.FINAL:
         dfFinal=df.loc[df['normalizedTime'] == 1]
     elif momento == constants.TMAX:
         dfFinal=df.loc[df['gasTemp'] == df.groupby('runName')['gasTemp'].transform('max')]
+    elif momento == constants.SHOCKAVG:
+        dfFinal=df.loc[df['gasTemp'] > 15].groupby(['runName']+constants.initparams[tipo],as_index=False)[['normalizedTime']+physical[tipo]+species].mean()
+        for prop in physical[tipo]+species:
+            with np.errstate(divide='ignore'): dfFinal[f'{prop}_log']=np.log10(dfFinal[prop])
 
     campos=['runName','normalizedTime']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
+    especies=[prop+'_log' for prop in species]
 
     tDic=dict([(key, []) for key in campos+['abundance_log', 'species']])
     for i in dfFinal.index:

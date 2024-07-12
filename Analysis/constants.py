@@ -33,3 +33,4 @@ ABUNDANCE = 'abundance'
 
 FINAL='Final'
 TMAX='Max Temp'
+SHOCKAVG= 'Inside Shock Average'
