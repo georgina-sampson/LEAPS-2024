@@ -135,3 +135,19 @@ def timePlot(df, prop, tipo, nameBase, plotType=constants.BAND, focus='runName')
 
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
+
+
+def finalAbundancePlot(df, phys, tipo, nameBase):
+    figName= '_'.join([nameBase+'/'+tipo.replace(' ','').upper(),constants.ABUNDANCE, phys])+'.png'
+    
+    fig, ax = plt.subplots(figsize=(7,5))
+    fig.subplots_adjust(top=0.93)
+    sns.scatterplot(df, x=phys, y='abundance_log',
+                hue='species', palette='gist_ncar',
+                linewidth=0, ax=ax, alpha=0.5,
+                )
+    sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.15), ncol=4)
+    fig.suptitle(tipo.upper()+': Final Abundances')
+
+    fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
