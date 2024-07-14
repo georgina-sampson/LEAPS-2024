@@ -1,5 +1,6 @@
 SHOCK = 'c shock'
 HOTCORE = 'hot core'
+BOTH = 'both'
 
 ITEMP = 'iTemp'
 FTEMP = 'fTemp'
@@ -18,11 +19,13 @@ PHASE2 = 'modelData'
 initparams={
     SHOCK: [COSMICRAY, INTERSTELLARRAD, IDENS, SHOCKVEL],
     HOTCORE: [COSMICRAY, INTERSTELLARRAD, IDENS, FTEMP],
+    BOTH: [COSMICRAY, INTERSTELLARRAD, IDENS, FTEMP, SHOCKVEL]
 }
 
 varPhys={
     SHOCK: ['gasTemp', 'av', 'Density'],
-    HOTCORE: ['gasTemp']
+    HOTCORE: ['gasTemp'],
+    BOTH: ['gasTemp', 'av', 'Density'],
 }
 
 SCATTER = 'scatter'

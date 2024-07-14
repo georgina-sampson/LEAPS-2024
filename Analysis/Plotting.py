@@ -30,7 +30,7 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
     
     return pd.concat(dflist, ignore_index=True)
 
-def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL):
+def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL, singleDf=True):
     if momento == constants.FINAL:
         dfFinal=df.loc[df['normalizedTime'] == 1]
     elif momento == constants.TMAX:
@@ -43,6 +43,7 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
         dfFinal=df
 
     campos=['runName','normalizedTime','Time']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
+    if not singleDf: campos.append('tipo')
     especies=[prop+'_log' for prop in species]
 
     tDic=dict([(key, []) for key in campos+['abundance_log', 'species']])
