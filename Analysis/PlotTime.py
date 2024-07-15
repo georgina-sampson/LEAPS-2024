@@ -27,11 +27,9 @@ for tipo in physical:
     yaxis= [f'{prop}_log' for prop in species]
     xaxis= [f'{prop}_log' for prop in physical[tipo]]
 
-    for phys in xaxis:
-        Plotting.timePlot(df, phys, tipo, nameBase+'physical/')
+    Plotting.timePlot(df, xaxis, tipo, nameBase+'physical/')
     
-    for spec in yaxis:
-        for focus in constants.initparams[tipo]:
-            Plotting.timePlot(df, spec, tipo, nameBase+'species/', constants.SCATTER, focus)
+    for focus in constants.initparams[tipo]+constants.varPhys[tipo]:
+        Plotting.timePlot(df, yaxis, tipo, nameBase+'species/', constants.SCATTER, focus)
 
     plt.close()
