@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import constants, os
+import constants, os, math
 
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
 myRnbw=sns.blend_palette(['#c02321','#ca4c16','#c2e000','#0fa4d2','#72469b'],as_cmap=True)
@@ -207,20 +207,20 @@ def typePhysicalGrid(df, physical, species, nameBase):
     for spec in species:
         figName= '_'.join([nameBase+constants.TIME+'/'+constants.BOTH.upper(),constants.TIME,spec])+'.png'
 
-        fig, axs = plt.subplots(len(physical),2, figsize=(8*len(physical), 12), sharex=True)
-        fig.subplots_adjust(top=0.9,wspace=0.5, hspace=0)
+        fig, axs = plt.subplots(2,len(physical), figsize=(8*len(physical), 12), sharex=True)
+        fig.subplots_adjust(top=0.9,wspace=0.15, hspace=0)
         fig.suptitle(f"Time Evolution: {spec}", size='large')
 
         for i, phys in enumerate(physical):
             sns.scatterplot(df, x="normalizedTime", y=spec+"_log",
-                            linewidth=0, alpha=0.5, ax=axs[i][0], 
-                            hue='tipo', palette='hls')
+                            linewidth=0, alpha=0.5, ax=axs[0][i], 
+                            hue='tipo', palette='hls', legend='auto' if i==math.floor(len(physical)/2) else None)
             sns.scatterplot(df, x="normalizedTime", y=phys+"_log",
-                            linewidth=0, alpha=0.5, ax=axs[i][1], legend=None,
+                            linewidth=0, alpha=0.5, ax=axs[1][i], legend=None,
                             hue='tipo', palette='hls')
-            axs[i][0].set_xscale('log')
-            axs[i][0].set_xlim(left=1e-7, right=1.1)
-            sns.move_legend(axs[i][0], "upper center", bbox_to_anchor=(0.5, 1.15), ncol=3)
+            axs[0][i].set_xscale('log')
+            axs[0][i].set_xlim(left=1e-7, right=1.1)
+        sns.move_legend(axs[0][math.floor(len(physical)/2)], "upper center", bbox_to_anchor=(0.5, 1.15), ncol=3)
         
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()

@@ -8,11 +8,13 @@ import seaborn as sns
 folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
 nameBase= folder.format('BothPlots/')
 
-physical = {constants.BOTH: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
+physical = {constants.SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
+            constants.HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield'],
+            constants.BOTH: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
 species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
 
 for tip in ['',constants.TIME+'/', constants.ABUNDANCE+'/']:
-    if not os.path.exists(nameBase+tip): os.makedirs(nameBase+'')
+    if not os.path.exists(nameBase+tip): os.makedirs(nameBase+tip)
 
 
 df=Plotting.buildDataframe([constants.HOTCORE, constants.SHOCK], folder, physical, species, singleDf=False)
