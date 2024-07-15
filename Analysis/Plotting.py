@@ -5,6 +5,7 @@ import pandas as pd
 import constants, os
 
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
+myRnbw=sns.blend_palette(['#c02321','#ca4c16','#c2e000','#0fa4d2','#72469b'],as_cmap=True)
 
 def buildDataframe(tipos, folder, physical, species, singleDf=True):
     if singleDf: tipos=[tipos]
@@ -187,6 +188,42 @@ def timePlot(df, prop, tipo, nameBase, plotType=constants.BAND, focus='runName')
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
 
+def typeAbundanceGrid(df, focusList, nameBase):
+    for focus in focusList:
+        figName= '_'.join([nameBase+constants.ABUNDANCE+'/'+constants.BOTH.upper(),constants.ABUNDANCE,focus])+'.png'
+        
+        g = sns.relplot(df, x="normalizedTime", y="abundance_log",
+                        linewidth=0, alpha=0.75,
+                        hue=focus+'_log', palette=myRnbw,
+                        row="tipo",  col="species", row_order=[constants.SHOCK,constants.HOTCORE],
+                        )
+        g.set(xscale='log', xlim=(None,1.1))
+        g.figure.suptitle('Abundances Timeline', size='xx-large')
+        g.figure.subplots_adjust(top=0.91)
+        g.savefig(figName, dpi=300, bbox_inches='tight')
+        plt.close()
+
+def typePhysicalGrid(df, physical, species, nameBase):
+    for spec in species:
+        figName= '_'.join([nameBase+constants.TIME+'/'+constants.BOTH.upper(),constants.TIME,spec])+'.png'
+
+        fig, axs = plt.subplots(len(physical),2, figsize=(8*len(physical), 12), sharex=True)
+        fig.subplots_adjust(top=0.9,wspace=0.5, hspace=0)
+        fig.suptitle(f"Time Evolution: {spec}", size='large')
+
+        for i, phys in enumerate(physical):
+            sns.scatterplot(df, x="normalizedTime", y=spec+"_log",
+                            linewidth=0, alpha=0.5, ax=axs[i][0], 
+                            hue='tipo', palette='hls')
+            sns.scatterplot(df, x="normalizedTime", y=phys+"_log",
+                            linewidth=0, alpha=0.5, ax=axs[i][1], legend=None,
+                            hue='tipo', palette='hls')
+            axs[i][0].set_xscale('log')
+            axs[i][0].set_xlim(left=1e-7, right=1.1)
+            sns.move_legend(axs[i][0], "upper center", bbox_to_anchor=(0.5, 1.15), ncol=3)
+        
+        fig.savefig(figName, dpi=300, bbox_inches='tight')
+        plt.close()
 
 def localAbundancePlot(df, phys, tipo, nameBase, momento=constants.FINAL):
     figName= '_'.join([nameBase+'/'+tipo.replace(' ','').upper(),constants.ABUNDANCE, momento, phys])+'.png'
