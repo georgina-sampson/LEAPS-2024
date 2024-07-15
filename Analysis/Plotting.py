@@ -174,22 +174,20 @@ def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runNa
     for i, prop in enumerate(propList):
         ax=axs[i//(wd)][i%(wd)]
         if plotType == constants.BAND:
-            sns.lineplot(df, x='normalizedTime', y=prop, ax=ax, 
+            sns.lineplot(df, x='normalizedTime_log', y=prop, ax=ax, 
                             hue=focus, palette=colormap, 
                             alpha=0.75,
                             errorbar=lambda x: (x.min(), x.max()),
                             legend='auto' if i==wd//2 and not focus=='runName' else None
                             )
         elif plotType == constants.SCATTER:
-            sns.scatterplot(df, x='normalizedTime', y=prop, ax=ax,
+            sns.scatterplot(df, x='normalizedTime_log', y=prop, ax=ax,
                                 hue=focus, palette=colormap, 
                                 linewidth=0, alpha=0.75, s=15,
                                 legend='auto' if i==wd//2 and not focus=='runName' else None
                                 )
             
         if i==wd//2 and not focus=='runName': sns.move_legend(ax, "lower center", bbox_to_anchor=(0.5, 1), ncol=6)
-        ax.set_xscale('log')
-        ax.set_xlim(right=1.1)
     fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large', y=0.95)
 
     fig.savefig(figName, dpi=300, bbox_inches='tight')

@@ -23,6 +23,7 @@ for tipo in physical:
 
     df= Plotting.buildDataframe(tipo, folder, physical, species)
     df['normalizedTime']= df['Time']/df.groupby('runName')['Time'].transform('max')
+    df['normalizedTime_log']= np.log10(df['normalizedTime'])
  
     yaxis= [f'{prop}_log' for prop in species]
     xaxis= [f'{prop}_log' for prop in physical[tipo]]
