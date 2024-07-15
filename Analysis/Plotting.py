@@ -5,7 +5,7 @@ import pandas as pd
 import constants, os, math
 
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
-myRnbw=sns.blend_palette(['#c02321','#ca4c16','#c2e000','#0fa4d2','#72469b'],as_cmap=True)
+myRnbw=sns.blend_palette(['#72469b','#0fa4d2','#c2e000','#ca4c16','#c02321'],as_cmap=True)
 
 def buildDataframe(tipos, folder, physical, species, singleDf=True):
     if singleDf: tipos=[tipos]
