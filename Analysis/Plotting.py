@@ -166,6 +166,7 @@ def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
 def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName'):
     figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),constants.TIME, '' if focus=='runName' else focus])+'.png'
     wd=math.ceil(len(propList)/2)
+    colormap= myRnbw if focus in constants.varPhys[tipo] else 'Dark2'
         
     fig, axs = plt.subplots(2,wd, figsize=(8*wd, 6*2), sharex=True)
     fig.subplots_adjust(wspace=0.15, hspace=0)
@@ -174,21 +175,22 @@ def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runNa
         ax=axs[i//(wd)][i%(wd)]
         if plotType == constants.BAND:
             sns.lineplot(df, x='normalizedTime', y=prop, ax=ax, 
-                            hue=focus, palette='icefire', alpha=0.5,
+                            hue=focus, palette=colormap, 
+                            alpha=0.75,
                             errorbar=lambda x: (x.min(), x.max()),
-                            legend='auto' if i==wd//2 else None
+                            legend='auto' if i==wd//2 and not focus=='runName' else None
                             )
         elif plotType == constants.SCATTER:
             sns.scatterplot(df, x='normalizedTime', y=prop, ax=ax,
-                                hue=focus, palette='icefire', 
-                                linewidth=0, alpha=0.5, s=15,
-                                legend='auto' if i==wd//2 else None
+                                hue=focus, palette=colormap, 
+                                linewidth=0, alpha=0.75, s=15,
+                                legend='auto' if i==wd//2 and not focus=='runName' else None
                                 )
             
-        if i==wd//2: sns.move_legend(ax, "lower center", bbox_to_anchor=(0.5, 1), ncol=6)
+        if i==wd//2 and not focus=='runName': sns.move_legend(ax, "lower center", bbox_to_anchor=(0.5, 1), ncol=6)
         ax.set_xscale('log')
         ax.set_xlim(right=1.1)
-    fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large', y=1.05 if focus=='runName' else 0.95)
+    fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large', y=0.95)
 
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
