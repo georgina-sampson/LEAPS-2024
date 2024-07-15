@@ -165,28 +165,30 @@ def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
 
 def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName'):
     figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),constants.TIME, '' if focus=='runName' else focus])+'.png'
-    
-    fig, axs = plt.subplots(len(propList), figsize=(8*len(propList), 6), sharex=True)
-    fig.subplots_adjust(top=0.9,wspace=0.15, hspace=0)
-    fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large')
-    
-    for i, prop in enumerate(propList):
-        if plotType == constants.BAND:
-            sns.lineplot(df, x='normalizedTime', y=prop, ax=axs[i], 
-                        hue=focus, palette='icefire', 
-                        errorbar=lambda x: (x.min(), x.max()),
-                        legend='auto' if i==math.floor(len(propList)/2) else None
-                        )
-        elif plotType == constants.SCATTER:
-            sns.scatterplot(df, x='normalizedTime', y=prop, ax=axs[i],
-                            hue=focus, palette='icefire', 
-                            linewidth=0, alpha=0.5, s=15,
-                            legend='auto' if i==math.floor(len(propList)/2) else None
-                            )
+    wd=math.ceil(len(propList)/2)
         
-        if i==math.floor(len(propList)/2): sns.move_legend(axs[i], "upper center", bbox_to_anchor=(0.5, 1.15), ncol=3)
-        axs[i].set_xscale('log')
-        axs[i].set_xlim(right=1.1)
+    fig, axs = plt.subplots(2,wd, figsize=(8*wd, 6*2), sharex=True)
+    fig.subplots_adjust(wspace=0.15, hspace=0)
+
+    for i, prop in enumerate(propList):
+        ax=axs[i//(wd)][i%(wd)]
+        if plotType == constants.BAND:
+            sns.lineplot(df, x='normalizedTime', y=prop, ax=ax, 
+                            hue=focus, palette='icefire', alpha=0.5,
+                            errorbar=lambda x: (x.min(), x.max()),
+                            legend='auto' if i==wd//2 else None
+                            )
+        elif plotType == constants.SCATTER:
+            sns.scatterplot(df, x='normalizedTime', y=prop, ax=ax,
+                                hue=focus, palette='icefire', 
+                                linewidth=0, alpha=0.5, s=15,
+                                legend='auto' if i==wd//2 else None
+                                )
+            
+        if i==wd//2: sns.move_legend(ax, "lower center", bbox_to_anchor=(0.5, 1), ncol=6)
+        ax.set_xscale('log')
+        ax.set_xlim(right=1.1)
+    fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large', y=1.05 if focus=='runName' else 0.95)
 
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
