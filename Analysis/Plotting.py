@@ -256,14 +256,17 @@ def localAbundancePlot(df, phys, tipo, nameBase, momento=constants.FINAL):
 
     figName= '_'.join([nameBase+'/'+tipo.replace(' ','').upper(),constants.ABUNDANCE, momento, phys])+'.png'
     
-    fig, ax = plt.subplots(figsize=(7,5))
-    fig.subplots_adjust(top=0.93)
+    fig, ax = plt.subplots(figsize=(7,7))
+    fig.subplots_adjust(top=0.95)
     sns.scatterplot(df, x=phys, y='abundance_log',
-                hue='species', palette='gist_ncar',
+                hue='species', palette='nipy_spectral',
                 linewidth=0, ax=ax, alpha=0.5,
                 )
-    sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.15), ncol=4)
+    sns.move_legend(ax, "upper right", bbox_to_anchor=(1, -0.07), ncol=4)
+    ax.set_ybound(-14,-3)
+    ax.minorticks_on()
     fig.suptitle(tipo.upper()+f': {momento} Abundances')
+    ax.annotate(df.groupby(by=['species'])['abundance_log'].count(), xy=(0,0), xycoords='figure fraction', va='bottom', ha='left')
 
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
