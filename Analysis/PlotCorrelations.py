@@ -31,10 +31,8 @@ for singleAxis in [True, False]:
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 
             focusList = constants.initparams[tipo]
-            for plotType in [constants.SCATTER, constants.BAND]:
-                Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase+subf, focusList, plotType)
-
-            Plotting.jointPlot(df, xaxis, yaxis, tipo, nameBase+subf, focusList)
+            Plotting.plottingGrid(df, yaxis, xaxis, tipo, nameBase+subf, focusList, constants.SCATTER)
             plt.close()
+
             if singleAxis: Plotting.contScatterPlot(df, xaxis, yaxis, tipo, nameBase+subf, [f'{prop}_log' for prop in constants.varPhys[tipo]])
             plt.close()

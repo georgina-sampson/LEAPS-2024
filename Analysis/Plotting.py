@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import seaborn as sns
 import pandas as pd
 import constants, os, math
@@ -119,7 +120,7 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType, contVar=
         if os.path.exists(figName.replace(phys+'_'+spec,spec+'_'+phys)): continue
 
         for j, focus in enumerate(focusList):
-            mycMap= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=3) if cMap == '' else cMap
+            mycMap= sns.hls_palette(s=1, l=.4, h=j*.17, n_colors=len(df[focus].unique())) if cMap == '' else cMap
             ax= axs[j] if len(focusList)>1 else axs
             if plotType == constants.SCATTER:
                 sns.scatterplot(df,x=phys,y=spec, ax=ax,
@@ -133,6 +134,9 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType, contVar=
                              errorbar=lambda x: (x.min(), x.max()),
                              )
             sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.15), ncol=3)
+            if spec in constants.species+[s+'_log' for s in constants.species]:
+                ax.set_ybound(-14,-4)
+                ax.minorticks_on()
 
         fig.suptitle(tipo.upper())
         fig.savefig(figName, dpi=300, bbox_inches='tight')
@@ -171,6 +175,9 @@ def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
             fig, ax = plt.subplots(figsize=(7,5))
             fig.subplots_adjust(top=0.93)
             snsax= sns.scatterplot(df,x=phys,y=spec, hue= focus, palette='hsv', linewidth=0, legend=None, alpha=0.5, s=15, ax=ax)
+            if spec in constants.species+[s+'_log' for s in constants.species]:
+                ax.set_ybound(-14,-4)
+                ax.minorticks_on()
 
             norm = plt.Normalize(df[focus].min(), df[focus].max())
             sm = plt.cm.ScalarMappable(cmap="hsv", norm=norm)
@@ -179,7 +186,7 @@ def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
             snsax.figure.savefig(figName, dpi=300, bbox_inches='tight')
             plt.close()
 
-def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName'):
+def timePhysPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName'):
     checkFolders(nameBase, [plotType+'/'])
 
     figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),constants.TIME, '' if focus=='runName' else focus])+'.png'
@@ -192,22 +199,59 @@ def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runNa
     for i, prop in enumerate(propList):
         ax=axs[i//(wd)][i%(wd)]
         if plotType == constants.BAND:
-            sns.lineplot(df, x='normalizedTime_log', y=prop, ax=ax, 
+            snsax=sns.lineplot(df, x='normalizedTime_log', y=prop, ax=ax, 
                             hue=focus, palette=colormap, 
                             alpha=0.75,
                             errorbar=lambda x: (x.min(), x.max()),
                             legend='auto' if i==wd//2 and not focus=='runName' else None
                             )
         elif plotType == constants.SCATTER:
-            sns.scatterplot(df, x='normalizedTime_log', y=prop, ax=ax,
+            snsax=sns.scatterplot(df, x='normalizedTime_log', y=prop, ax=ax,
                                 hue=focus, palette=colormap, 
                                 linewidth=0, alpha=0.75, s=15,
                                 legend='auto' if i==wd//2 and not focus=='runName' else None
                                 )
             
         if i==wd//2 and not focus=='runName': sns.move_legend(ax, "lower center", bbox_to_anchor=(0.5, 1), ncol=6)
+        if prop in constants.species+[s+'_log' for s in constants.species]:
+            ax.set_ybound(-14,-4)
+            ax.minorticks_on()
     fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large', y=0.95)
 
+    fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
+
+def timeSpecPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName'):
+    checkFolders(nameBase, [plotType+'/'])
+
+    figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),constants.TIME, '' if focus=='runName' else focus])+'.png'
+    colormap= myRnbw if focus in constants.varPhys[tipo] else 'Dark2'
+    cont= focus in constants.varPhys[tipo]
+        
+    if cont: fig, axs = plt.subplots(1,len(propList)+1, figsize=(8*len(propList), 6), width_ratios=len(propList)*[10]+[1])
+    else: fig, axs = plt.subplots(1,len(propList), figsize=(8*len(propList), 6))
+
+    fig.subplots_adjust(top=.85,wspace=0.15, hspace=0.05)
+    for i, prop in enumerate(propList):
+        ax=axs[i]
+        snsax=sns.scatterplot(df, x='normalizedTime_log', y=prop, ax=ax,
+                    hue=focus, palette=colormap, 
+                    linewidth=0, alpha=0.75, s=15,
+                    legend= None if i<len(propList)-1 and not cont else 'auto'
+                    )
+        ax.set_ybound(-14,-4)
+        ax.minorticks_on()
+        ax.set_title(prop)
+
+    if cont:
+        norm = plt.Normalize(df[focus].min(), df[focus].max())
+        sm = plt.cm.ScalarMappable(cmap=colormap, norm=norm)
+        sm.set_array([])
+        snsax.figure.colorbar(sm, cax=axs[len(propList)], label=focus)
+    else:
+        sns.move_legend(axs[len(propList)-1], 'center left', bbox_to_anchor=(1, 0.5))
+
+    fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large', y=0.95)
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
 
@@ -216,16 +260,51 @@ def typeAbundanceGrid(df, focusList, nameBase):
 
     for focus in focusList:
         figName= '_'.join([nameBase+constants.ABUNDANCE+'/'+constants.BOTH.upper(),constants.ABUNDANCE,focus])+'.png'
-        
-        g = sns.relplot(df, x="normalizedTime_log", y="abundance_log",
-                        linewidth=0, alpha=0.75,
-                        hue=focus+'_log', palette=myRnbw,
-                        row="tipo",  col="species", row_order=[constants.SHOCK,constants.HOTCORE],
-                        )
-        g.set(xlim=(None,1.1))
-        g.figure.suptitle('Abundances Timeline', size='xx-large')
-        g.figure.subplots_adjust(top=0.91)
-        g.savefig(figName, dpi=300, bbox_inches='tight')
+        cont= focus in constants.varPhys[constants.BOTH]
+        colormap= myRnbw if cont else 'Dark2'
+        specList= constants.species
+
+        fig = plt.figure(figsize=(8*len(specList), 6*2))
+        if cont:
+            gs = GridSpec(2, len(specList)+1, figure=fig, width_ratios=len(specList)*[10]+[1],
+                          top=.9,wspace=0, hspace=0.1)
+        else: 
+            gs = GridSpec(2, len(specList), figure=fig,
+                          top=.9,wspace=0, hspace=0.1)
+
+        focus=focus+'_log'
+        for j, tipo in enumerate([constants.HOTCORE, constants.SHOCK]):
+            for i, prop in enumerate(specList):
+                ax=fig.add_subplot(gs[j,i])
+                snsax=sns.scatterplot(df[(df['tipo']==tipo)&(df['species']==prop+'_log')],
+                                      x='normalizedTime_log', y='abundance_log', ax=ax,
+                                      hue=focus, palette=colormap, 
+                                      linewidth=0, alpha=0.75,
+                                      legend= 'auto' if j==0 and i==len(specList)-1 and not cont else None
+                                      )
+                ax.set_ybound(-14,-4)
+                ax.set_xbound(-8,0.1)
+                ax.minorticks_on()
+                if i>0:
+                    ax.set_ylabel(None)
+                    ax.set_yticklabels([])
+                if j<1:
+                    ax.set_xlabel(None)
+                    ax.set_xticklabels([])
+                ax.set_title(f"type= {tipo} | species= {prop}")
+                if j==0 and i==len(specList)-1 and not cont: legAx=ax
+
+        if cont:
+            cax=fig.add_subplot(gs[:, -1])
+            norm = plt.Normalize(df[focus].min(), df[focus].max())
+            sm = plt.cm.ScalarMappable(cmap=colormap, norm=norm)
+            sm.set_array([])
+            snsax.figure.colorbar(sm, cax=cax, label=focus)
+        else:
+            sns.move_legend(legAx, 'center left', bbox_to_anchor=(1, 0.5))
+
+        fig.suptitle(f"Time Evolution: {tipo.upper()}", size='large', y=0.95)
+        fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
 
 def typePhysicalGrid(df, physical, species, nameBase):
@@ -242,6 +321,8 @@ def typePhysicalGrid(df, physical, species, nameBase):
             sns.scatterplot(df, x="normalizedTime_log", y=spec+"_log",
                             linewidth=0, alpha=0.5, ax=axs[0][i], 
                             hue='tipo', palette='hls', legend='auto' if i==math.floor(len(physical)/2) else None)
+            axs[0][i].set_ybound(-14,-4)
+            axs[0][i].minorticks_on()
             sns.scatterplot(df, x="normalizedTime_log", y=phys+"_log",
                             linewidth=0, alpha=0.5, ax=axs[1][i], legend=None,
                             hue='tipo', palette='hls')
