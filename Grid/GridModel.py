@@ -114,6 +114,7 @@ def run_modelCloud(row):
     if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
     result = uclchem.model.cloud(param_dict=ParameterDictionary)
+    checkFile(ParameterDictionary["outputFile"])
     return result[0]
 
 def run_modelHotCore(row):
@@ -138,8 +139,8 @@ def run_modelHotCore(row):
     if constants.ROUT in row: ParameterDictionary[constants.ROUT]=row.rout
     if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
-    print(ParameterDictionary["outputFile"])
     result=uclchem.model.hot_core(temp_indx=3,max_temperature=row.fTemp,param_dict=ParameterDictionary)
+    checkFile(ParameterDictionary["outputFile"])
     return result[0]
 
 def run_modelShock(row):
@@ -167,6 +168,7 @@ def run_modelShock(row):
     if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
     result, dissTime = uclchem.model.cshock(shock_vel=row.shockVel,param_dict=ParameterDictionary)
+    checkFile(ParameterDictionary["outputFile"])
     row["run_result"]=result
     row["dissipation_time"]=dissTime
     return row
