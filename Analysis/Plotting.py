@@ -263,7 +263,7 @@ def localAbundancePlot(df, phys, tipo, nameBase, momento=constants.FINAL):
                 linewidth=0, ax=ax, alpha=0.5,
                 )
     sns.move_legend(ax, "upper right", bbox_to_anchor=(1, -0.07), ncol=4)
-    ax.set_ybound(-14,-3)
+    ax.set_ybound(-14,-4)
     ax.minorticks_on()
     fig.suptitle(tipo.upper()+f': {momento} Abundances')
     ax.annotate(df.groupby(by=['species'])['abundance_log'].count(), xy=(0,0), xycoords='figure fraction', va='bottom', ha='left')
