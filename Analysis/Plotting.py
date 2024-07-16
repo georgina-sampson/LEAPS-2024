@@ -25,7 +25,7 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
         df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(),
                                 columns=constants.initparams[tipo]), rsuffix='_str')
         df['normalizedTime']= df['Time']/df.groupby('runName')['Time'].transform('max')
-        df['normalizedTime_log']= np.log10(df['normalizedTime'])
+        with np.errstate(divide='ignore'): df['normalizedTime_log']= np.log10(df['normalizedTime'])
 
         if singleDf:
             return df
@@ -41,13 +41,14 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
     elif momento == constants.TMAX:
         dfFinal=df.loc[df['gasTemp'] == df.groupby('runName')['gasTemp'].transform('max')]
     elif momento == constants.SHOCKAVG:
-        dfFinal=df.loc[df['gasTemp'] > 15].groupby(['runName']+constants.initparams[tipo],as_index=False)[['normalizedTime']+physical[tipo]+species].mean()
-        for prop in physical[tipo]+species:
+        vals=['normalizedTime','Time']+physical[tipo]+species
+        dfFinal=df.loc[df['gasTemp'] > 15].groupby(['runName']+constants.initparams[tipo],as_index=False)[vals].mean()
+        for prop in vals:
             with np.errstate(divide='ignore'): dfFinal[f'{prop}_log']=np.log10(dfFinal[prop])
     elif momento == constants.ALL:
         dfFinal=df
 
-    campos=['runName','normalizedTime','normalizedTime_log','Time']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
+    campos=['runName','normalizedTime','normalizedTime_log','Time', 'Time_log']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
     if not singleDf: campos.append('tipo')
     especies=[prop+'_log' for prop in species]
 
