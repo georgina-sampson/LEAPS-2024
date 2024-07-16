@@ -11,7 +11,7 @@ nameBase= folder.format('TimePlots/')
 physical = constants.physical
 species= constants.species
 
-for tipo in physical:
+for tipo in [constants.HOTCORE, constants.SHOCK]:
     print(tipo)
     focusList=constants.initparams[tipo]
 

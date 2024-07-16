@@ -12,7 +12,7 @@ species= constants.species
 for singleAxis in [True, False]:
     print('singleAxis',singleAxis)
     subf= '/species/' if singleAxis else '/physical/'
-    for tipo in physical:
+    for tipo in [constants.HOTCORE, constants.SHOCK]:
         print(tipo)
         df= Plotting.buildDataframe(tipo, folder, physical, species)
         
@@ -26,6 +26,7 @@ for singleAxis in [True, False]:
         xaxis, yaxis = Plotting.getCorrValues(corr)
 
         if len(xaxis)>0 and len(yaxis)>0:
+            Plotting.checkFolders(nameBase, [subf])
             figName=nameBase+subf+tipo.replace(' ','').upper()+f"_{'species_' if singleAxis else ''}focusedCorrGrid_log_log.png"
             Plotting.corrGrid(df, list(set(xaxis)), list(set(yaxis)), tipo, 0.5)[1].savefig(figName, dpi=300, bbox_inches='tight')
 

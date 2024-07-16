@@ -11,7 +11,7 @@ nameBase= folder.format('AbundancePlots/')
 physical = constants.physical
 species= constants.species
 
-for tipo in physical:
+for tipo in [constants.HOTCORE, constants.SHOCK]:
     print(tipo)
 
     df= Plotting.buildDataframe(tipo, folder, physical, species)
