@@ -216,12 +216,12 @@ def typeAbundanceGrid(df, focusList, nameBase):
     for focus in focusList:
         figName= '_'.join([nameBase+constants.ABUNDANCE+'/'+constants.BOTH.upper(),constants.ABUNDANCE,focus])+'.png'
         
-        g = sns.relplot(df, x="normalizedTime", y="abundance_log",
+        g = sns.relplot(df, x="normalizedTime_log", y="abundance_log",
                         linewidth=0, alpha=0.75,
                         hue=focus+'_log', palette=myRnbw,
                         row="tipo",  col="species", row_order=[constants.SHOCK,constants.HOTCORE],
                         )
-        g.set(xscale='log', xlim=(None,1.1))
+        g.set(xlim=(None,1.1))
         g.figure.suptitle('Abundances Timeline', size='xx-large')
         g.figure.subplots_adjust(top=0.91)
         g.savefig(figName, dpi=300, bbox_inches='tight')
@@ -238,14 +238,13 @@ def typePhysicalGrid(df, physical, species, nameBase):
         fig.suptitle(f"Time Evolution: {spec}", size='large')
 
         for i, phys in enumerate(physical):
-            sns.scatterplot(df, x="normalizedTime", y=spec+"_log",
+            sns.scatterplot(df, x="normalizedTime_log", y=spec+"_log",
                             linewidth=0, alpha=0.5, ax=axs[0][i], 
                             hue='tipo', palette='hls', legend='auto' if i==math.floor(len(physical)/2) else None)
-            sns.scatterplot(df, x="normalizedTime", y=phys+"_log",
+            sns.scatterplot(df, x="normalizedTime_log", y=phys+"_log",
                             linewidth=0, alpha=0.5, ax=axs[1][i], legend=None,
                             hue='tipo', palette='hls')
-            axs[0][i].set_xscale('log')
-            axs[0][i].set_xlim(left=1e-7, right=1.1)
+            # axs[0][i].set_xlim(left=1e-7, right=1.1)
         sns.move_legend(axs[0][math.floor(len(physical)/2)], "upper center", bbox_to_anchor=(0.5, 1.15), ncol=3)
         
         fig.savefig(figName, dpi=300, bbox_inches='tight')

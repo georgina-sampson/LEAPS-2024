@@ -12,11 +12,11 @@ try:
                     constants.COSMICRAY: np.array([10, 1000]),
                     constants.INTERSTELLARRAD: np.array([3, 1000])}
 
-    # stage1_df, folder, parmNum = grid.stage1(gridParameters)
+    stage1_df, folder, parmNum = grid.stage1(gridParameters)
 
-    # Reload Stage 1
-    folder = '/data2/gsampsonolalde/LEAPS-2024/Grid/2024-07-16_105046/'
-    stage1_df, parmNum = grid.reload_stage1(gridParameters, folder)
+    # # Reload Stage 1
+    # folder = '' #/data2/gsampsonolalde/LEAPS-2024/Grid/2024-07-16_105046/
+    # stage1_df, parmNum = grid.reload_stage1(gridParameters, folder)
 
     grid.giveTime(t_start)
 
