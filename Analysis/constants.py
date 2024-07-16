@@ -16,6 +16,12 @@ BAV = 'bAv'
 PHASE1 = 'startData'
 PHASE2 = 'modelData'
 
+folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
+physical = {SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', SHOCKVEL],
+            HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield'],
+            BOTH: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
+species=['#CH3OH', 'CH3OH', 'SIO']
+
 initparams={
     SHOCK: [COSMICRAY, INTERSTELLARRAD, IDENS, SHOCKVEL],
     HOTCORE: [COSMICRAY, INTERSTELLARRAD, IDENS, FTEMP],

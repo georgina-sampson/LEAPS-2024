@@ -1,21 +1,13 @@
-import constants, Plotting, os
-import pandas as pd
-import numpy as np
+import constants, Plotting
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # folder = '{}'
-folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
-
+folder = constants.folder
 nameBase= folder.format('CorrelationPlots/')
-physical = {constants.SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
-            constants.HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
-species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
 
+physical = constants.physical
+species= constants.species
 
-for tip in [constants.SCATTER, constants.JOINT, constants.BAND, 'contVars']:
-    if not os.path.exists(nameBase+'/species/'+tip+'/'): os.makedirs(nameBase+'/species/'+tip+'/')
-    if not os.path.exists(nameBase+'/physical/'+tip+'/'): os.makedirs(nameBase+'/physical/'+tip+'/')
 
 for singleAxis in [True, False]:
     print('singleAxis',singleAxis)

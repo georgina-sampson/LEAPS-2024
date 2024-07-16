@@ -5,25 +5,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # folder = '{}'
-folder = '/data2/gsampsonolalde/LEAPS-2024/Analysis/{}'
+folder = constants.folder
 nameBase= folder.format('TimePlots/')
 
-physical = {constants.SHOCK: ['Density', 'gasTemp', 'av', 'zeta', 'radfield', constants.SHOCKVEL],
-            constants.HOTCORE: ['Density', 'gasTemp', 'av', 'zeta', 'radfield']}
-species=['#CH3OH', 'CH3OH', '#SIO', 'SIO']
-
-
-for tip in [constants.BAND, constants.SCATTER]:
-    if not os.path.exists(nameBase+'/species/'+tip+'/'): os.makedirs(nameBase+'/species/'+tip+'/')
-    if not os.path.exists(nameBase+'/physical/'+tip+'/'): os.makedirs(nameBase+'/physical/'+tip+'/')
+physical = constants.physical
+species= constants.species
 
 for tipo in physical:
     print(tipo)
     focusList=constants.initparams[tipo]
 
     df= Plotting.buildDataframe(tipo, folder, physical, species)
-    df['normalizedTime']= df['Time']/df.groupby('runName')['Time'].transform('max')
-    df['normalizedTime_log']= np.log10(df['normalizedTime'])
  
     yaxis= [f'{prop}_log' for prop in species]
     xaxis= [f'{prop}_log' for prop in physical[tipo]]

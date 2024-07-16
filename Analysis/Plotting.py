@@ -7,6 +7,7 @@ import constants, os, math
 myCmap=sns.diverging_palette(170, 330, l=65, center="dark", as_cmap=True)
 myRnbw=sns.blend_palette(['#72469b','#0fa4d2','#c2e000','#ca4c16','#c02321'],as_cmap=True)
 
+# Dataframe builder
 def buildDataframe(tipos, folder, physical, species, singleDf=True):
     if singleDf: tipos=[tipos]
     else: dflist=[]
@@ -23,6 +24,9 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
         df=df.reset_index().drop(columns=['index'])
         df=df.join(pd.DataFrame(df['runName'].str.replace('.dat','').str.split('_').values.tolist(),
                                 columns=constants.initparams[tipo]), rsuffix='_str')
+        df['normalizedTime']= df['Time']/df.groupby('runName')['Time'].transform('max')
+        df['normalizedTime_log']= np.log10(df['normalizedTime'])
+
         if singleDf:
             return df
         else:
@@ -43,7 +47,7 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
     elif momento == constants.ALL:
         dfFinal=df
 
-    campos=['runName','normalizedTime','Time']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
+    campos=['runName','normalizedTime','normalizedTime_log','Time']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
     if not singleDf: campos.append('tipo')
     especies=[prop+'_log' for prop in species]
 
@@ -56,7 +60,11 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
                 tDic[c].append(dfFinal.at[i,c])
     return pd.DataFrame(tDic)
 
+def checkFolders(nameBase, subFolders):
+    for subF in subFolders:
+        if not os.path.exists(nameBase+subF): os.makedirs(nameBase+subF)
 
+# Correlation Matrix
 def isValid(x, y):
     phases=['#','@','$']
     if x==y: return False
@@ -95,7 +103,11 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0):
     ax.set_title(tipo.upper())
     return cor, fig
 
+
+# Plotting
 def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType, contVar= '', cMap=''):
+    checkFolders(nameBase, [plotType+'/'])
+
     for i, phys in enumerate(xaxis):
         fig, axs = plt.subplots(1, len(focusList), figsize=(5*len(focusList),4))
         fig.subplots_adjust(wspace=0.25,top=0.9)
@@ -126,6 +138,8 @@ def plottingGrid(df, xaxis, yaxis, tipo, nameBase, focusList, plotType, contVar=
         plt.close()
 
 def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList, contVar= '', cMap=''):
+    checkFolders(nameBase, [constants.JOINT+'/'])
+
     for i, phys in enumerate(xaxis):
         spec=yaxis[i]
 
@@ -145,6 +159,8 @@ def jointPlot(df, xaxis, yaxis, tipo, nameBase, focusList, contVar= '', cMap='')
         plt.close()
 
 def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
+    checkFolders(nameBase, ['contVars'+'/'])
+
     for i, phys in enumerate(xaxis):
         spec=yaxis[i]
         for focus in focusList:
@@ -162,8 +178,9 @@ def contScatterPlot(df, xaxis, yaxis, tipo, nameBase, focusList):
             snsax.figure.savefig(figName, dpi=300, bbox_inches='tight')
             plt.close()
 
-
 def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName'):
+    checkFolders(nameBase, [plotType+'/'])
+
     figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),constants.TIME, '' if focus=='runName' else focus])+'.png'
     wd=math.ceil(len(propList)/2)
     colormap= myRnbw if focus in constants.varPhys[tipo] else 'Dark2'
@@ -194,6 +211,8 @@ def timePlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runNa
     plt.close()
 
 def typeAbundanceGrid(df, focusList, nameBase):
+    checkFolders(nameBase, [constants.ABUNDANCE+'/'])
+
     for focus in focusList:
         figName= '_'.join([nameBase+constants.ABUNDANCE+'/'+constants.BOTH.upper(),constants.ABUNDANCE,focus])+'.png'
         
@@ -209,6 +228,8 @@ def typeAbundanceGrid(df, focusList, nameBase):
         plt.close()
 
 def typePhysicalGrid(df, physical, species, nameBase):
+    checkFolders(nameBase, [constants.TIME+'/'])
+
     for spec in species:
         figName= '_'.join([nameBase+constants.TIME+'/'+constants.BOTH.upper(),constants.TIME,spec])+'.png'
 
@@ -231,6 +252,8 @@ def typePhysicalGrid(df, physical, species, nameBase):
         plt.close()
 
 def localAbundancePlot(df, phys, tipo, nameBase, momento=constants.FINAL):
+    checkFolders(nameBase, ['/'])
+
     figName= '_'.join([nameBase+'/'+tipo.replace(' ','').upper(),constants.ABUNDANCE, momento, phys])+'.png'
     
     fig, ax = plt.subplots(figsize=(7,5))

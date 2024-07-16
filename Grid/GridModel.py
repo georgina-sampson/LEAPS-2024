@@ -18,6 +18,7 @@ def stage1(gridParameters):
 
     #check both conditions are met
     stage1_df["Successful"]=(stage1_df.run_result>=0) & (stage1_df.elements_conserved)
+    stage1_df.to_csv(f'{folder}stage1_df.csv')
     print('Stage 1 - end')
     return stage1_df, folder, parmNum
 
@@ -137,6 +138,7 @@ def run_modelHotCore(row):
     if constants.ROUT in row: ParameterDictionary[constants.ROUT]=row.rout
     if constants.BAV in row: ParameterDictionary['baseAv']=row.bAv
 
+    print(ParameterDictionary["outputFile"])
     result=uclchem.model.hot_core(temp_indx=3,max_temperature=row.fTemp,param_dict=ParameterDictionary)
     return result[0]
 
@@ -168,6 +170,15 @@ def run_modelShock(row):
     row["run_result"]=result
     row["dissipation_time"]=dissTime
     return row
+
+# Rename file
+def checkFile(filePath):
+    if not os.path.exists(filePath):
+        newName=filePath.split('/')[-1]
+        fold=filePath.split(newName)[0]
+        tL= [f for f in os.listdir(fold) if newName.split('.dat')[0] in f]
+        oldFileName=tL[0]
+        os.rename(fold+oldFileName, filePath)
 
 # Checking Your Grid
 def element_check(output_file):
