@@ -291,7 +291,7 @@ def typeAbundanceGrid(df, focusList, nameBase, xaxis='normalizedTime_log', xboun
                 if j<1:
                     ax.set_xlabel(None)
                     ax.set_xticklabels([])
-                ax.set_title(f"type= {tipo} | species= {spec}")
+                ax.set_title(f"""type= {tipo} | species= {spec} \n {df[(df['tipo']==tipo)&(df['species']==spec+'_log')]['abundance_log'].count()} points""")
                 if j==0 and i==len(specList)-1 and not cont: legAx=ax
 
         if cont:
