@@ -332,22 +332,22 @@ def typePhysicalGrid(df, physical, species, nameBase):
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
 
-def abundanceScater(df, xaxis, focus, nameBase):
+def abundanceScater(df, xaxis, focus, nameBase, tipo=constants.BOTH, cols=[constants.HOTCORE, constants.SHOCK], col_filter='tipo'):
     checkFolders(nameBase, [constants.ABUNDANCE+'/'])
-    figName= '_'.join([nameBase+constants.ABUNDANCE+'/'+constants.BOTH,constants.SCATTER,focus,xaxis,constants.ABUNDANCE])+'.png'
+    figName= '_'.join([nameBase+constants.ABUNDANCE+'/'+tipo,constants.SCATTER,focus,xaxis,constants.ABUNDANCE])+'.png'
 
-    fig, axs = plt.subplots(1,2, figsize=(10,10))
-    fig.subplots_adjust(top=0.93)
-    for i, tipo in enumerate([constants.HOTCORE, constants.SHOCK]):
+    fig, axs = plt.subplots(1,len(cols), figsize=(7*len(cols),7))
+    for i, col in enumerate(cols):
         ax=axs[i]
 
-        sns.scatterplot(df,x=xaxis,y='abundance_log', ax=ax,
+        sns.scatterplot(df[df[col_filter]==col],
+                        x=xaxis,y='abundance_log', ax=ax,
                         hue= focus, palette='hsv',
                         linewidth=0, alpha=0.5, s=10)
         ax.set_ybound(-14,-4)
         ax.minorticks_on()
-        ax.set_title(tipo.upper())
-        sns.move_legend(ax, "lower center", bbox_to_anchor=(0.5, 0))
+        ax.set_title(col.upper())
+        sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.1), ncols=4)
     
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
