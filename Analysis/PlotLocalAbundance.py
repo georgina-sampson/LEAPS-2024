@@ -6,7 +6,7 @@ import seaborn as sns
 
 # folder = '{}'
 folder = constants.folder
-nameBase= folder.format('AbundancePlots/')
+nameBase= folder.format('LocalAbundancePlots/')
 
 physical = constants.physical
 species= constants.species

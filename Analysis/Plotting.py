@@ -255,7 +255,7 @@ def timeSpecPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='r
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
 
-def typeAbundanceGrid(df, focusList, nameBase):
+def typeAbundanceGrid(df, focusList, nameBase, xaxis='normalizedTime_log', xbound=-6):
     checkFolders(nameBase, [constants.ABUNDANCE+'/'])
 
     for focus in focusList:
@@ -274,16 +274,16 @@ def typeAbundanceGrid(df, focusList, nameBase):
 
         focus=focus+'_log'
         for j, tipo in enumerate([constants.HOTCORE, constants.SHOCK]):
-            for i, prop in enumerate(specList):
+            for i, spec in enumerate(specList):
                 ax=fig.add_subplot(gs[j,i])
-                snsax=sns.scatterplot(df[(df['tipo']==tipo)&(df['species']==prop+'_log')],
-                                      x='normalizedTime_log', y='abundance_log', ax=ax,
+                snsax=sns.scatterplot(df[(df['tipo']==tipo)&(df['species']==spec+'_log')],
+                                      x=xaxis, y='abundance_log', ax=ax,
                                       hue=focus, palette=colormap, 
-                                      linewidth=0, alpha=0.75,
+                                      linewidth=0, alpha=0.75, s=15,
                                       legend= 'auto' if j==0 and i==len(specList)-1 and not cont else None
                                       )
                 ax.set_ybound(-14,-4)
-                ax.set_xbound(-8,0.1)
+                ax.set_xbound(xbound,0.1)
                 ax.minorticks_on()
                 if i>0:
                     ax.set_ylabel(None)
@@ -291,7 +291,7 @@ def typeAbundanceGrid(df, focusList, nameBase):
                 if j<1:
                     ax.set_xlabel(None)
                     ax.set_xticklabels([])
-                ax.set_title(f"type= {tipo} | species= {prop}")
+                ax.set_title(f"type= {tipo} | species= {spec}")
                 if j==0 and i==len(specList)-1 and not cont: legAx=ax
 
         if cont:
@@ -331,6 +331,26 @@ def typePhysicalGrid(df, physical, species, nameBase):
         
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
+
+def abundanceScater(df, xaxis, focus, nameBase):
+    checkFolders(nameBase, [constants.ABUNDANCE+'/'])
+    figName= '_'.join([nameBase+constants.ABUNDANCE+'/'+constants.BOTH,constants.SCATTER,focus,xaxis,constants.ABUNDANCE])+'.png'
+
+    fig, axs = plt.subplots(1,2, figsize=(10,10))
+    fig.subplots_adjust(top=0.93)
+    for i, tipo in enumerate([constants.HOTCORE, constants.SHOCK]):
+        ax=axs[i]
+
+        sns.scatterplot(df,x=xaxis,y='abundance_log', ax=ax,
+                        hue= focus, palette='hsv',
+                        linewidth=0, alpha=0.5, s=10)
+        ax.set_ybound(-14,-4)
+        ax.minorticks_on()
+        ax.set_title(tipo.upper())
+        sns.move_legend(ax, "lower center", bbox_to_anchor=(0.5, 0))
+    
+    fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
 
 def localAbundancePlot(df, phys, tipo, nameBase, momento=constants.FINAL):
     checkFolders(nameBase, ['/'])
