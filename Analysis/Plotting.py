@@ -221,6 +221,42 @@ def timePhysPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='r
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
 
+def timeSingleSpecPlot(df, spec, propList, tipo, nameBase, xbound=-6):
+    checkFolders(nameBase, [constants.SCATTER+'/'])
+
+    figName= '_'.join([nameBase+constants.SCATTER+'/'+tipo.replace(' ','').upper(),constants.TIME, spec])+'.png'
+    fig, axs = plt.subplots(1,len(propList), figsize=(8*len(propList), 6),
+                            width_ratios=[11 if p in constants.varPhys[tipo] else 10 for p in propList])
+
+    fig.subplots_adjust(top=.85,wspace=0.15, hspace=0.05)
+    for i, focus in enumerate(propList):
+        colormap= myRnbw if focus in constants.varPhys[tipo] else 'Dark2'
+        cont= focus in constants.varPhys[tipo]
+        if focus not in constants.initparams[tipo]: focus=focus+'_log'
+
+        ax=axs[i]
+        snsax=sns.scatterplot(df, x='normalizedTime_log', y=spec, ax=ax,
+                    hue=focus, palette=colormap, 
+                    linewidth=0, alpha=0.75, s=15,
+                    legend= None if cont else 'auto'
+                    )
+        ax.set_ybound(-14,-4)
+        ax.minorticks_on()
+        ax.set_xbound(xbound,0.1)
+        ax.set_title(focus)
+
+        if cont:
+            norm = plt.Normalize(df[focus].min(), df[focus].max())
+            sm = plt.cm.ScalarMappable(cmap=colormap, norm=norm)
+            sm.set_array([])
+            snsax.figure.colorbar(sm, ax=ax, label=focus)
+        else:
+            sns.move_legend(ax, 'upper center', bbox_to_anchor=(0.5, -0.1), ncol=6)
+
+    fig.suptitle(f"Time Evolution: {tipo.upper()} - {spec}", size='large', y=0.95)
+    fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
+
 def timeSpecPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName', xbound=-6):
     checkFolders(nameBase, [plotType+'/'])
 

@@ -25,6 +25,7 @@ g=sns.relplot(jointDf[(jointDf['species']=='#CH3OH_log')|(jointDf['species']=='C
             x=xaxis,y='abundance_log', col='zeta_log',
             hue='species', palette='hsv_r',
             linewidth=0, alpha=0.5, s=10)
+g.figure.suptitle(tipo.upper())
 g.figure.savefig(figName, dpi=300, bbox_inches='tight')
 plt.close()
 

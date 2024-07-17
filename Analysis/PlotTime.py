@@ -24,5 +24,8 @@ for tipo in [constants.HOTCORE, constants.SHOCK]:
     
     for focus in constants.initparams[tipo]+constants.varPhys[tipo]:
         Plotting.timeSpecPlot(df, yaxis, tipo, nameBase+'species/', constants.SCATTER, focus)
+    
+    for spec in yaxis:
+        Plotting.timeSingleSpecPlot(df, spec, physical[tipo], tipo, nameBase, xbound=-6)
 
     plt.close()
