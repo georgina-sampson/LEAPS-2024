@@ -227,6 +227,7 @@ def timeSpecPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='r
     figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),constants.TIME, '' if focus=='runName' else focus])+'.png'
     colormap= myRnbw if focus in constants.varPhys[tipo] else 'Dark2'
     cont= focus in constants.varPhys[tipo]
+    if focus not in constants.initparams[tipo]: focus=focus+'_log'
         
     if cont: fig, axs = plt.subplots(1,len(propList)+1, figsize=(8*len(propList), 6), width_ratios=len(propList)*[10]+[1])
     else: fig, axs = plt.subplots(1,len(propList), figsize=(8*len(propList), 6))
