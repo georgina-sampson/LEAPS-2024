@@ -221,7 +221,7 @@ def timePhysPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='r
     fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
 
-def timeSpecPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName'):
+def timeSpecPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='runName', xbound=-6):
     checkFolders(nameBase, [plotType+'/'])
 
     figName= '_'.join([nameBase+plotType+'/'+tipo.replace(' ','').upper(),constants.TIME, '' if focus=='runName' else focus])+'.png'
@@ -238,10 +238,11 @@ def timeSpecPlot(df, propList, tipo, nameBase, plotType=constants.BAND, focus='r
         snsax=sns.scatterplot(df, x='normalizedTime_log', y=prop, ax=ax,
                     hue=focus, palette=colormap, 
                     linewidth=0, alpha=0.75, s=15,
-                    legend= None if i<len(propList)-1 and not cont else 'auto'
+                    legend= None if i<len(propList)-1 or cont else 'auto'
                     )
         ax.set_ybound(-14,-4)
         ax.minorticks_on()
+        ax.set_xbound(xbound,0.1)
         ax.set_title(prop)
 
     if cont:
