@@ -12,7 +12,8 @@ def makeDataframe(filePath: str, tdf):
 
 folder = '/data2/gsampsonolalde/LEAPS-2024/Grid/{}/{}/'
 # runs = {constants.SHOCK: '2024-07-01_124848', constants.HOTCORE: '2024-07-01_134429'}
-runs={constants.HOTCORE: '2024-07-16_115707'}
+runs={constants.HOTCORE: '2024-07-16_115707',
+      constants.SHOCK: '2024-07-01_124848'}
 
 for tipo in runs:
     tdf= pd.read_csv(folder.format(runs[tipo], "stage2_df.csv")[:-1], index_col=0)
@@ -22,4 +23,4 @@ for tipo in runs:
     df=df.reset_index()
     df.pop('index')
 
-    df.to_csv('/data2/gsampsonolalde/LEAPS-2024/Analysis/'+tipo+'.csv')
+    df.to_csv('/data2/gsampsonolalde/LEAPS-2024/CH3OH/'+tipo+'.csv')
