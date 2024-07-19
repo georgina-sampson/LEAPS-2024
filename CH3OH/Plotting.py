@@ -19,9 +19,10 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
         df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
         df[species] = df[species][df[species] >= 1e-14]
 
-        max_size_df = df.loc[df.groupby('runName')['CH3OH'].idxmax()]
-        merged_df = df.merge(max_size_df[['runName', 'Time']], on='runName', suffixes=('', '_max_size'))
-        df = merged_df[merged_df['Time'] <= merged_df['Time_max_size']].drop(columns='Time_max_size')
+        if tipo==constants.HOTCORE:
+            max_size_df = df.loc[df.groupby('runName')['CH3OH'].idxmax()]
+            merged_df = df.merge(max_size_df[['runName', 'Time']], on='runName', suffixes=('', '_max_size'))
+            df = merged_df[merged_df['Time'] <= merged_df['Time_max_size']].drop(columns='Time_max_size')
 
         for prop in ['Time']+physical[tipo]+species:
             with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
@@ -57,10 +58,11 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
     if not singleDf: campos.append('tipo')
     especies=[prop+'_log' for prop in species]
 
-    tDic=dict([(key, []) for key in campos+['abundance_log', 'species']])
+    tDic=dict([(key, []) for key in campos+['abundance','abundance_log', 'species']])
     for i in dfFinal.index:
-        for spec in especies:
-            tDic['abundance_log'].append(dfFinal.at[i,spec]) 
+        for spec in species:
+            tDic['abundance'].append(dfFinal.at[i,spec]) 
+            with np.errstate(divide='ignore'): tDic['abundance_log'].append(np.log10(dfFinal.at[i,spec]))
             tDic['species'].append(spec)
             for c in campos:
                 tDic[c].append(dfFinal.at[i,c])
@@ -174,21 +176,39 @@ def singleBox(df, xaxis, yaxis, focus, tipo, nameBase, title,
 
     notLeg= False if focus else True
     if notLeg: focus = xaxis
-    norm = colors.LogNorm(df[focus].min(),df[focus].max())
 
     fig, axi = plt.subplots(figsize=(10,8))
     axs= figAx if returnAx else axi
     fig.subplots_adjust(top=0.95)
     sns.boxplot(df, x=xaxis, y=yaxis,
-                hue=focus, palette=sns.blend_palette(['#7668b6','#2e82dc','#7c8e67','#e6b40f','#e26628','#8c001a'],as_cmap=True),
-                hue_norm=norm,
+                hue=focus, palette='hls',
                 legend=None if notLeg else 'auto',
                 orient='v', log_scale=True, ax=axs)
-    axs.minorticks_on()
 
     if yaxis in constants.species+['abundance']: axs.set_ybound(1e-14,1e-4)
     if not notLeg: sns.move_legend(axs, "upper center", bbox_to_anchor=(0.5, -0.1), ncol=df[focus].nunique())
 
     fig.suptitle(title)
+    if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
+
+def gridBox(df, plotDict, tipo, title, nameBase, saveFig=True):
+    checkFolders(nameBase)
+    figName= '_'.join([nameBase,tipo.replace(' ','').upper()]+[row for row in plotDict])+'.png'
+
+    cols, rows, focusList = (plotDict[row] for row in plotDict)
+    nRow=len(rows)
+    nCol=len(cols)
+
+    fig, axs = plt.subplots(nRow, nCol, figsize=(8*nCol,6*nRow))
+    fig.subplots_adjust(top=0.95, wspace=0.15, hspace=0.3)
+    fig.suptitle(title, size='xx-large', y=1)
+
+    for i in range(nRow):
+        for j in range(nCol):
+            ax=axs[i][j]
+            singleBox(df, cols[j], rows[i], focusList[j], tipo, nameBase, '', saveFig=False, returnAx=True, figAx=ax)
+            ax.set_title(' | '.join([cols[j], rows[i], focusList[j]]))
+
     if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
