@@ -113,7 +113,7 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0, saveFig=False, nameBase='')
     ax.set_title(tipo.upper())
     if saveFig:
         checkFolders(nameBase)
-        fig.savefig('_'.join([nameBase,tipo.replace(' ','').upper(),'focusedCorrGrid'])+'.png',
+        fig.savefig('_'.join([nameBase+tipo.replace(' ','').upper(),'focusedCorrGrid'])+'.png',
                     dpi=300, bbox_inches='tight')
     return cor
 
@@ -121,10 +121,10 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0, saveFig=False, nameBase='')
 def singleScatter(df, xaxis, yaxis, focus, tipo, nameBase, title,
                   xbound=-6, saveFig=True, returnAx=False, figAx=None):
     checkFolders(nameBase)
-    figName= '_'.join([nameBase,tipo.replace(' ','').upper(),xaxis,yaxis,focus])+'.png'
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),xaxis,yaxis,focus])+'.png'
 
     contVar= focus in constants.varPhys[tipo]
-    colorPalette=sns.blend_palette(['#2e82dc','#5d417b','#8c001a','#f2c32c'],as_cmap=True) if contVar else ['#72469b','#0fa4d2','#c2e000','#ca4c16','#c02321']
+    colorPalette=sns.blend_palette(['#2e82dc','#5d417b','#8c001a','#f2c32c'],as_cmap=True) if contVar else ['#72469b','#0fa4d2','#c2e000','#ca4c16','#c02321'][:df[focus].nunique()]
     norm = colors.LogNorm(df[focus].min(),df[focus].max())if contVar else None
 
     fig, axi = plt.subplots(figsize=(10 if contVar else 8,8))
@@ -144,7 +144,7 @@ def singleScatter(df, xaxis, yaxis, focus, tipo, nameBase, title,
         sm.set_array([])
         fig.colorbar(sm, ax=axs, label=focus)
     else:
-        sns.move_legend(axs, "center left", bbox_to_anchor=(1, 0.5))
+        sns.move_legend(axs, "upper center", bbox_to_anchor=(0.5, -0.1), ncol=df[focus].nunique())
 
     fig.suptitle(title)
     if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
@@ -152,7 +152,7 @@ def singleScatter(df, xaxis, yaxis, focus, tipo, nameBase, title,
 
 def gridScatter(df, plotDict, tipo, title, nameBase, xbound=-6, saveFig=True):
     checkFolders(nameBase)
-    figName= '_'.join([nameBase,tipo.replace(' ','').upper()]+[row for row in plotDict])+'.png'
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper()]+['_'.join(plotDict[row]) for row in plotDict])+'.png'
 
     cols, rows, focusList = (plotDict[row] for row in plotDict)
     nRow=len(rows)
@@ -164,7 +164,10 @@ def gridScatter(df, plotDict, tipo, title, nameBase, xbound=-6, saveFig=True):
 
     for i in range(nRow):
         for j in range(nCol):
-            ax=axs[i][j]
+            if nRow>1 and nCol>1: ax=axs[i][j]
+            elif nRow>1: ax=axs[i]
+            else: ax=axs[j]
+
             singleScatter(df, cols[j], rows[i], focusList[j], tipo, nameBase, '', xbound=xbound, saveFig=False, returnAx=True, figAx=ax)
             ax.set_title(' | '.join([cols[j], rows[i], focusList[j]]))
 
@@ -174,7 +177,7 @@ def gridScatter(df, plotDict, tipo, title, nameBase, xbound=-6, saveFig=True):
 def singleBox(df, xaxis, yaxis, focus, tipo, nameBase, title,
                   saveFig=True, returnAx=False, figAx=None):
     checkFolders(nameBase)
-    figName= '_'.join([nameBase,tipo.replace(' ','').upper(),xaxis,yaxis,focus])+'.png'
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),xaxis,yaxis,focus])+'.png'
 
     notLeg= False if focus else True
     if notLeg: focus = xaxis
@@ -196,7 +199,7 @@ def singleBox(df, xaxis, yaxis, focus, tipo, nameBase, title,
 
 def gridBox(df, plotDict, tipo, title, nameBase, saveFig=True):
     checkFolders(nameBase)
-    figName= '_'.join([nameBase,tipo.replace(' ','').upper()]+[row for row in plotDict])+'.png'
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper()]+['_'.join(plotDict[row]) for row in plotDict])+'.png'
 
     cols, rows, focusList = (plotDict[row] for row in plotDict)
     nRow=len(rows)
