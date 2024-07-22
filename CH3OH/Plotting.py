@@ -54,9 +54,11 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
     elif momento == constants.ALL:
         dfFinal=df
 
-    campos=['runName','normalizedTime','normalizedTime_log','Time', 'Time_log']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]
+    campos=['runName','normalizedTime','normalizedTime_log','Time', 'Time_log']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]+physical[tipo]
     if not singleDf: campos.append('tipo')
     especies=[prop+'_log' for prop in species]
+    if tipo==constants.SHOCK: campos=campos[:-1]
+
 
     tDic=dict([(key, []) for key in campos+['abundance','abundance_log', 'species']])
     for i in dfFinal.index:

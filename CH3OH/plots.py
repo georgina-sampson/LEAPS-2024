@@ -1,0 +1,22 @@
+# import numpy as np
+# import matplotlib.pyplot as plt, matplotlib.colors as colors
+# from matplotlib.gridspec import GridSpec
+# import seaborn as sns
+# import pandas as pd
+import constants, os, math
+import Plotting as pl
+
+folder = constants.folder
+nameBase= folder.format('')
+species=['CH3OH','#CH3OH']
+
+df_sh = pl.buildDataframe(constants.SHOCK, constants.folder, constants.physical, species, singleDf=True)
+df_hc = pl.buildDataframe(constants.HOTCORE, constants.folder, constants.physical, species, singleDf=True)
+df_db = pl.buildDataframe([constants.SHOCK, constants.HOTCORE], constants.folder, constants.physical, species, singleDf=False)
+
+for tipo, dfi in {constants.HOTCORE: df_hc, constants.SHOCK: df_sh}.items():
+    df=pl.localAbundanceDataframe(dfi, species, constants.physical, tipo, momento=constants.ALL, singleDf=True)
+    pl.singleBox(df, 'zeta', 'abundance', 'species', tipo, nameBase, 'Abundance vs Cosmic Rays', saveFig=True, returnAx=False, figAx=None)
+    
+    plotDict={'cols':['CH3OH', '#CH3OH'], 'rows':['gasTemp']*2, 'focusList':['zeta']*2}
+    pl.gridScatter(dfi, plotDict, tipo, 'Gas and Surface Methanol', nameBase, xbound=-6, saveFig=True)
