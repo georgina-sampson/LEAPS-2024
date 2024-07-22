@@ -211,7 +211,10 @@ def gridBox(df, plotDict, tipo, title, nameBase, saveFig=True):
 
     for i in range(nRow):
         for j in range(nCol):
-            ax=axs[i][j]
+            if nRow>1 and nCol>1: ax=axs[i][j]
+            elif nRow>1: ax=axs[i]
+            else: ax=axs[j]
+            
             singleBox(df, cols[j], rows[i], focusList[j], tipo, nameBase, '', saveFig=False, returnAx=True, figAx=ax)
             ax.set_title(' | '.join([cols[j], rows[i], focusList[j]]))
 
