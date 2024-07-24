@@ -19,10 +19,12 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
         df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
         df[species] = df[species][df[species] >= 1e-14]
 
-        # if tipo==constants.HOTCORE:
-        #     max_size_df = df.loc[df.groupby('runName')['CH3OH'].idxmax()]
-        #     merged_df = df.merge(max_size_df[['runName', 'Time']], on='runName', suffixes=('', '_max_size'))
-        #     df = merged_df[merged_df['Time'] <= merged_df['Time_max_size']].drop(columns='Time_max_size')
+        if tipo==constants.HOTCORE:
+            max_meth_df = df.loc[df.groupby('runName')['CH3OH'].idxmax()]
+            merged_df = df.merge(max_meth_df[['runName', 'Time']], on='runName', suffixes=('', '_max_meth'))
+            min_ftemp_df = df.loc[df.groupby('runName')['gasTemp'].idxmax()]
+            merged_df = merged_df.merge(min_ftemp_df[['runName', 'Time']], on='runName', suffixes=('', '_min_ftemp'))
+            df = merged_df[merged_df['Time'] <= merged_df[['Time_max_meth','Time_min_ftemp']].max(axis=1)].drop(columns=['Time_max_meth','Time_min_ftemp'])
 
         for prop in ['Time']+physical[tipo]+species:
             with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
