@@ -1,6 +1,5 @@
 # import numpy as np
-# import matplotlib.pyplot as plt, matplotlib.colors as colors
-# from matplotlib.gridspec import GridSpec
+import matplotlib.pyplot as plt
 # import seaborn as sns
 # import pandas as pd
 import constants, os, math
@@ -16,13 +15,14 @@ df_db = pl.buildDataframe([constants.SHOCK, constants.HOTCORE], constants.folder
 
 # Contiuity Plots
 for tipo, df in {constants.HOTCORE: df_hc, constants.SHOCK: df_sh}.items():
+    print(tipo)
     for runN in df['runName'].unique():
         pl.continuityPlot(df, runN, species, tipo, nameBase+f'subplots/{tipo}/', saveFig=True)
-    
+    plt.close()
     imList=[nameBase+f'subplots/{tipo}/'+p for p in os.listdir(nameBase+f'subplots/{tipo}/') ]
     pl.continuityGrid(imList, tipo, nameBase, saveFig=True)
 
-
+# Misc
 # for tipo, dfi in {constants.HOTCORE: df_hc, constants.SHOCK: df_sh}.items():
 #     df=pl.localAbundanceDataframe(dfi, species, constants.physical, tipo, momento=constants.ALL, singleDf=True)
 #     pl.singleBox(df, 'zeta', 'abundance', 'species', tipo, nameBase, 'Abundance vs Cosmic Rays', saveFig=True, returnAx=False, figAx=None)

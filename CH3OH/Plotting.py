@@ -121,6 +121,8 @@ def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
     figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY,runN.strip('.dat')])+'.png'
     
     tdf=df[df['runName']==runN]
+    methmax=tdf[tdf['CH3OH']==tdf['CH3OH'].max()]['Time'].max()
+    ftmin=tdf[tdf['gasTemp']==tdf['gasTemp'].max()]['Time'].min()
 
     fig, axs = plt.subplots(2, 1, figsize=(6,8), sharex=True)
     fig.subplots_adjust(top=0.95, hspace=0.05)
@@ -129,13 +131,17 @@ def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
         axs[1].plot(tdf['Time_log'], tdf[col], label=col, c=['#ca1551','#1f7a8c','#884ab2'][i])
         
     fig.suptitle(runN)
+    axs[1].axvline(ftmin, c='blue')
     axs[1].set_yscale('log')
     axs[1].set_xlabel('Time_log')
+    axs[1].grid(True)  
 
     for j,col in enumerate(species):
         axs[0].plot(tdf['Time_log'], tdf[col], label=col, c=['#4cb944','#e76f51'][j])
+    axs[0].axvline(methmax, c='red')
     axs[0].set_yscale('log')
     axs[0].set_ybound(1e-14,1e-4)
+    axs[0].grid(True)  
 
     fig.legend(ncols=3+len(species), loc='lower center')
     if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
@@ -145,7 +151,7 @@ def continuityGrid(imList, tipo, nameBase, saveFig=True):
     checkFolders(nameBase)
     figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY])+'.png'
 
-    fig, axs = plt.subplots(4,9, figsize=(9*4,4*4))
+    fig, axs = plt.subplots(4,9, figsize=(32,16))
     fig.subplots_adjust(top=0.95, hspace=0, wspace=0)
 
     for i, image_file in enumerate(imList):
