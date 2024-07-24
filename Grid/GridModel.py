@@ -43,7 +43,7 @@ def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder
     print('setupGrid - start')
     if not folder:
         ahora = str(datetime.now()).split('.')[0].replace(' ','_').replace(':','')
-        folder = f'/data2/gsampsonolalde/LEAPS-2024/Grid/{ahora}/'
+        folder = f'Grid/{ahora}/'
 
     stage1= True if prevModel.empty == True else False
     grid_folder = folder+'startData/' if stage1 else folder+'modelData/'
@@ -55,8 +55,8 @@ def setupGrid(parameters: dict, prevModel = pd.DataFrame({'vacio' : []}), folder
 
     #keep track of where each model output will be saved and make sure that folder exists
     model_table["outputFile"]=model_table.apply(lambda row: f"{grid_folder}{'_'.join([str(row[key]) for key in model_table.columns])}.dat", axis=1)
-    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}startcollapse{'_'.join([str(row[key]) for key in model_table.columns[:len(parameters.keys())]])}.dat", axis=1)
-    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/startcollapse{'_'.join([str(row[key.replace(constants.FDENS,constants.IDENS)]) for key in prevModel.columns[:prevParamNum]])}.dat", axis=1)
+    if stage1: model_table["abundSaveFile"]=model_table.apply(lambda row: f"{grid_folder}stclps{'_'.join([str(row[key]) for key in model_table.columns[:len(parameters.keys())]])}.dat", axis=1)
+    else: model_table["abundLoadFile"]=model_table.apply(lambda row: f"{folder}startData/stclps{'_'.join([str(row[key.replace(constants.FDENS,constants.IDENS)]) for key in prevModel.columns[:prevParamNum]])}.dat", axis=1)
     print(f"{model_table.shape[0]} models to run")
 
     if not os.path.exists(folder): os.makedirs(folder)
@@ -115,6 +115,7 @@ def run_modelCloud(row):
 
     result = uclchem.model.cloud(param_dict=ParameterDictionary)
     checkFile(ParameterDictionary["outputFile"])
+    checkFile(ParameterDictionary["abundSaveFile"])
     return result[0]
 
 def run_modelHotCore(row):
