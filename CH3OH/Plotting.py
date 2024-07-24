@@ -121,8 +121,8 @@ def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
     figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY,runN.strip('.dat')])+'.png'
     
     tdf=df[df['runName']==runN]
-    methmax=tdf[tdf['CH3OH']==tdf['CH3OH'].max()]['Time'].max()
-    ftmin=tdf[tdf['gasTemp']==tdf['gasTemp'].max()]['Time'].min()
+    methmax=tdf[tdf['CH3OH']==tdf['CH3OH'].max()]['Time_log'].max()
+    ftmin=tdf[tdf['gasTemp']==tdf['gasTemp'].max()]['Time_log'].min()
 
     fig, axs = plt.subplots(2, 1, figsize=(6,8), sharex=True)
     fig.subplots_adjust(top=0.95, hspace=0.05)
@@ -132,6 +132,7 @@ def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
         
     fig.suptitle(runN)
     axs[1].axvline(ftmin, c='blue')
+    axs[1].axvline(methmax, c='red')
     axs[1].set_yscale('log')
     axs[1].set_xlabel('Time_log')
     axs[1].grid(True)  
@@ -139,6 +140,7 @@ def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
     for j,col in enumerate(species):
         axs[0].plot(tdf['Time_log'], tdf[col], label=col, c=['#4cb944','#e76f51'][j])
     axs[0].axvline(methmax, c='red')
+    axs[0].axvline(ftmin, c='blue')
     axs[0].set_yscale('log')
     axs[0].set_ybound(1e-14,1e-4)
     axs[0].grid(True)  
