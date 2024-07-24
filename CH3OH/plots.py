@@ -13,14 +13,7 @@ df_sh = pl.buildDataframe(constants.SHOCK, constants.folder, constants.physical,
 df_hc = pl.buildDataframe(constants.HOTCORE, constants.folder, constants.physical, species, singleDf=True)
 df_db = pl.buildDataframe([constants.SHOCK, constants.HOTCORE], constants.folder, constants.physical, species, singleDf=False)
 
-# Contiuity Plots
-for tipo, df in {constants.HOTCORE: df_hc, constants.SHOCK: df_sh}.items():
-    print(tipo)
-    for runN in df['runName'].unique():
-        pl.continuityPlot(df, runN, species, tipo, nameBase+f'subplots/{tipo}/', saveFig=True)
-    plt.close()
-    imList=[nameBase+f'subplots/{tipo}/'+p for p in os.listdir(nameBase+f'subplots/{tipo}/') ]
-    pl.continuityGrid(imList, tipo, nameBase, saveFig=True)
+
 
 # Misc
 # for tipo, dfi in {constants.HOTCORE: df_hc, constants.SHOCK: df_sh}.items():
