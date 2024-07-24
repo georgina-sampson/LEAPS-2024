@@ -45,3 +45,8 @@ FINAL='Final'
 TMAX='Max Temp'
 SHOCKAVG= 'Inside Shock Average'
 ALL= 'Full'
+
+times={
+    HOTCORE: [FINAL],
+    SHOCK: [FINAL,TMAX,SHOCKAVG]
+}
