@@ -39,6 +39,7 @@ BAND = 'band'
 JOINT = 'joint'
 TIME = 'time'
 ABUNDANCE = 'abundance'
+CONTINUITY = 'continuity'
 
 FINAL='Final'
 TMAX='Max Temp'

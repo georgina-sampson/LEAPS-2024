@@ -116,6 +116,48 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0, saveFig=False, nameBase='')
     return cor
 
 # Plotting
+def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
+    checkFolders(nameBase)
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY,runN.strip('.dat')]+species)+'.png'
+    
+    tdf=df[df['runName']==runN]
+
+    fig, axs = plt.subplots(2, 1, figsize=(6,8), sharex=True)
+    fig.subplots_adjust(top=0.95, hspace=0.05)
+
+    for i,col in enumerate(['gasTemp', 'Density', 'av']):
+        axs[1].plot(tdf['Time_log'], tdf[col], label=col, c=['#ca1551','#1f7a8c','#884ab2'][i])
+        
+    fig.suptitle(runN)
+    axs[1].set_yscale('log')
+    axs[1].set_xlabel('Time_log')
+
+    for j,col in enumerate(species):
+        axs[0].plot(tdf['Time_log'], tdf[col], label=col, c=['#4cb944','#e76f51'][j])
+    axs[0].set_yscale('log')
+    axs[0].set_ybound(1e-14,1e-4)
+
+    fig.legend(ncols=3+len(species), loc='lower center')
+    if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
+
+def continuityGrid(imList, tipo, nameBase, saveFig=True):
+    checkFolders(nameBase)
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY])+'.png'
+
+    fig, axs = plt.subplots(4,9, figsize=(9*4,8*4))
+    fig.subplots_adjust(top=0.95, hspace=0, wspace=0)
+
+    for i, image in enumerate(imList):
+        ax=axs[i//4][i%4]
+        ax.imshow(image)
+        ax.axis('off')
+    
+    fig.suptitle('Continuity Plot '+tipo.upper())
+    if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
+
+
 def singleScatter(df, xaxis, yaxis, focus, tipo, nameBase, title,
                   xbound=-6, saveFig=True, returnAx=False, figAx=None):
     checkFolders(nameBase)
