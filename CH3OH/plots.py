@@ -16,7 +16,7 @@ df_db = pl.buildDataframe([constants.SHOCK, constants.HOTCORE], constants.folder
 
 # Contiuity Plots
 for tipo, df in {constants.HOTCORE: df_hc, constants.SHOCK: df_sh}.items():
-    for runN in df['runName'][:4]:
+    for runN in df['runName'].unique():
         pl.continuityPlot(df, runN, species, tipo, nameBase+f'subplots/{tipo}/', saveFig=True)
     
     imList=[nameBase+f'subplots/{tipo}/'+p for p in os.listdir(nameBase+f'subplots/{tipo}/') ]

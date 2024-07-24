@@ -19,10 +19,10 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
         df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
         df[species] = df[species][df[species] >= 1e-14]
 
-        if tipo==constants.HOTCORE:
-            max_size_df = df.loc[df.groupby('runName')['CH3OH'].idxmax()]
-            merged_df = df.merge(max_size_df[['runName', 'Time']], on='runName', suffixes=('', '_max_size'))
-            df = merged_df[merged_df['Time'] <= merged_df['Time_max_size']].drop(columns='Time_max_size')
+        # if tipo==constants.HOTCORE:
+        #     max_size_df = df.loc[df.groupby('runName')['CH3OH'].idxmax()]
+        #     merged_df = df.merge(max_size_df[['runName', 'Time']], on='runName', suffixes=('', '_max_size'))
+        #     df = merged_df[merged_df['Time'] <= merged_df['Time_max_size']].drop(columns='Time_max_size')
 
         for prop in ['Time']+physical[tipo]+species:
             with np.errstate(divide='ignore'): df[f'{prop}_log']=np.log10(df[prop])
@@ -118,7 +118,7 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0, saveFig=False, nameBase='')
 # Plotting
 def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
     checkFolders(nameBase)
-    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY,runN.strip('.dat')]+species)+'.png'
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY,runN.strip('.dat')])+'.png'
     
     tdf=df[df['runName']==runN]
 
@@ -145,11 +145,12 @@ def continuityGrid(imList, tipo, nameBase, saveFig=True):
     checkFolders(nameBase)
     figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY])+'.png'
 
-    fig, axs = plt.subplots(4,9, figsize=(9*4,8*4))
+    fig, axs = plt.subplots(4,9, figsize=(9*4,4*4))
     fig.subplots_adjust(top=0.95, hspace=0, wspace=0)
 
-    for i, image in enumerate(imList):
-        ax=axs[i//4][i%4]
+    for i, image_file in enumerate(imList):
+        ax=axs[i//9][i%9]
+        image = plt.imread(image_file)
         ax.imshow(image)
         ax.axis('off')
     
