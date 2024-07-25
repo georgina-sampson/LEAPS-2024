@@ -118,6 +118,50 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0, saveFig=False, nameBase='')
     return cor
 
 # Plotting
+def abundanceComparison(la_df, focusList, hueList, nameBase, saveFig=True, returnFilepaths=False):
+    if returnFilepaths: pathDic=[]
+    for focus in focusList:
+        for param in la_df[focus].unique():
+            df=la_df[la_df[focus]==param]
+            for hue in [h for h in hueList if h!=focus]:
+                checkFolders(nameBase)
+                figName='_'.join([nameBase+constants.ABUNDANCE,focus,param,hue])+'.png'
+                if returnFilepaths:pathDic.append({'focus':focus,'param':param,'hue':hue,'path':figName})
+
+                fig, ax = plt.subplots(figsize=(20,10), layout='tight')
+                ax.grid(True)  
+                sns.lineplot(data=df, x='Time', y='abundance',
+                            hue=hue, style='tipo',
+                            palette='gnuplot',
+                            errorbar=lambda x: (x.min(), x.max()),
+                            ax=ax)
+                ax.set_xscale('log')
+                ax.set_yscale('log')
+                ax.set_xbound(1,df['Time'].max())
+                ax.set_ybound(1e-14,1e-4)
+                sns.move_legend(ax, "upper center", bbox_to_anchor=(0.5, -0.06), ncol=3 if hue==constants.IDENS else 2)
+                fig.suptitle('CH3OH Abundance - Time Evolution Comparison \n'+' | '.join([f'{focus}={param}',hue]))
+                if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
+                plt.close()
+    if returnFilepaths: return pd.DataFrame(pathDic)
+
+def abundanceComparisonGrid(imList, ncols, nrows, focusParm, nameBase, saveFig=True, title='CH3OH Abundance Comparison '):
+    checkFolders(nameBase)
+    figName= '_'.join([nameBase+constants.ABUNDANCE,focusParm])+'.png'
+
+    fig, axs = plt.subplots(ncols,nrows, figsize=(6*nrows,3*ncols))
+    fig.subplots_adjust(top=0.95, hspace=0, wspace=0)
+
+    for i, image_file in enumerate(imList):
+        ax=axs[i//nrows][i%nrows]
+        image = plt.imread(image_file)
+        ax.imshow(image)
+        ax.axis('off')
+    
+    fig.suptitle(title+focusParm.upper())
+    if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
+
 def continuityPlot(df, runN, species, tipo, nameBase, saveFig=True):
     checkFolders(nameBase)
     figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.CONTINUITY,runN.strip('.dat')])+'.png'
@@ -168,6 +212,52 @@ def continuityGrid(imList, tipo, nameBase, saveFig=True):
     if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
     plt.close()
 
+def localAbundancePlot(m_df, focus, tipo, nameBase, returnFilepaths=False):
+    checkFolders(nameBase)
+    colorPalette=['#f72585','#2667ff','#004b23']
+    markers=['d','s','o']
+    filePaths=[]
+
+    for param in m_df[focus].unique():
+        dfi=m_df[m_df[focus]==param]
+        figName= '_'.join([nameBase+tipo.replace(' ','').upper(),'abundance',focus,str(param)])+'.png'
+
+        fig, axs = plt.subplots(figsize=(16,8))
+        fig.subplots_adjust(top=0.95)
+        for i, time in enumerate(constants.times[tipo]):
+            df=localAbundanceDataframe(dfi, constants.species, constants.physical, tipo, momento=time, singleDf=True)
+            axs.scatter(df['runName'], df['abundance'], label=time,
+                        c=colorPalette[i], s=50, marker=markers[i],
+                        linewidth=0, alpha=0.75)
+
+        axs.set_yscale('log')
+        axs.set_ybound(1e-14,1e-4)
+        axs.tick_params(axis='x', labelrotation=90)
+        fig.legend(ncols=3, loc="upper right", bbox_to_anchor=(0.9, 1))
+
+        fig.suptitle(f"CH3OH Abundance {tipo.upper()}: {focus}={param}",ha='right')
+        fig.savefig(figName, dpi=300, bbox_inches='tight')
+        plt.close()
+        if returnFilepaths: filePaths.append(figName)
+    if returnFilepaths: return filePaths
+
+def localAbundanceGrid(imList, tipo, focus, nameBase, saveFig=True):
+    checkFolders(nameBase)
+    figName= '_'.join([nameBase+tipo.replace(' ','').upper(),constants.ABUNDANCE, focus])+'.png'
+    focusLen=len(imList)
+
+    fig, axs = plt.subplots(1,focusLen, figsize=(4*focusLen,3))
+    fig.subplots_adjust(top=0.95, hspace=0, wspace=0)
+
+    for i, image_file in enumerate(imList):
+        ax=axs[i]
+        image = plt.imread(image_file)
+        ax.imshow(image)
+        ax.axis('off')
+    
+    fig.suptitle('Local Abundance Plot '+tipo.upper())
+    if saveFig: fig.savefig(figName, dpi=300, bbox_inches='tight')
+    plt.close()
 
 def singleScatter(df, xaxis, yaxis, focus, tipo, nameBase, title,
                   xbound=-6, saveFig=True, returnAx=False, figAx=None):
