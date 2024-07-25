@@ -118,7 +118,7 @@ def corrGrid(df, xaxis, yaxis, tipo: str, barrera=0, saveFig=False, nameBase='')
     return cor
 
 # Plotting
-def abundanceComparison(la_df, focusList, hueList, nameBase, saveFig=True, returnFilepaths=False):
+def abundanceComparison(la_df, focusList, hueList, nameBase, saveFig=True, returnFilepaths=False, onlyDF=False):
     if returnFilepaths: pathDic=[]
     for focus in focusList:
         for param in la_df[focus].unique():
@@ -127,6 +127,7 @@ def abundanceComparison(la_df, focusList, hueList, nameBase, saveFig=True, retur
                 checkFolders(nameBase)
                 figName='_'.join([nameBase+constants.ABUNDANCE,focus,param,hue])+'.png'
                 if returnFilepaths:pathDic.append({'focus':focus,'param':param,'hue':hue,'path':figName})
+                if onlyDF: continue
 
                 fig, ax = plt.subplots(figsize=(20,10), layout='tight')
                 ax.grid(True)  

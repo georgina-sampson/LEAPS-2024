@@ -17,7 +17,7 @@ df_db = pl.buildDataframe([constants.SHOCK, constants.HOTCORE], constants.folder
 la_df=pl.localAbundanceDataframe(df_db, species, constants.physical, constants.BOTH, momento=constants.ALL, singleDf=False)
 params=[constants.COSMICRAY, constants.INTERSTELLARRAD, constants.IDENS]
 
-path_df= pl.abundanceComparison(la_df, params, params, nameBase+'abundanceComparison/subplots/', saveFig=True, returnFilepaths=True)
+path_df= pl.abundanceComparison(la_df, params, params, nameBase+'abundanceComparison/subplots/', saveFig=True, returnFilepaths=True, onlyDF=True)
 
 for focusParm in params:
     imList=list(path_df[path_df['hue' if focusParm==constants.IDENS else 'focus']==focusParm]['path'])
