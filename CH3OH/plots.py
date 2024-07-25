@@ -16,6 +16,7 @@ df_db = pl.buildDataframe([constants.SHOCK, constants.HOTCORE], constants.folder
 def localAbundancePlot(m_df, focus, tipo, nameBase, returnFilepaths=False):
     pl.checkFolders(nameBase)
     colorPalette=['#f72585','#2667ff','#004b23']
+    markers=['d','s','o']
     filePaths=[]
 
     for param in m_df[focus].unique():
@@ -27,7 +28,7 @@ def localAbundancePlot(m_df, focus, tipo, nameBase, returnFilepaths=False):
         for i, time in enumerate(constants.times[tipo]):
             df=pl.localAbundanceDataframe(dfi, constants.species, constants.physical, tipo, momento=time, singleDf=True)
             axs.scatter(df['runName'], df['abundance'], label=time,
-                        c=colorPalette[i], s=50,
+                        c=colorPalette[i], s=50, marker=markers[i],
                         linewidth=0, alpha=0.75)
 
         axs.set_yscale('log')
