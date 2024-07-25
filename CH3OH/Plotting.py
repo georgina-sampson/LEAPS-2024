@@ -125,16 +125,19 @@ def abundanceComparison(la_df, focusList, hueList, nameBase, saveFig=True, retur
             df=la_df[la_df[focus]==param]
             for hue in [h for h in hueList if h!=focus]:
                 checkFolders(nameBase)
-                figName='_'.join([nameBase+constants.ABUNDANCE,focus,param,hue])+'.png'
+                # figName='_'.join([nameBase+constants.ABUNDANCE,focus,param,hue])+'.png'
+                figName='_'.join([nameBase+constants.ABUNDANCE,constants.SCATTER,focus,param,hue])+'.png'
                 if returnFilepaths:pathDic.append({'focus':focus,'param':param,'hue':hue,'path':figName})
                 if onlyDF: continue
 
                 fig, ax = plt.subplots(figsize=(20,10), layout='tight')
                 ax.grid(True)  
-                sns.lineplot(data=df, x='Time', y='abundance',
+                # sns.lineplot(data=df, x='Time', y='abundance',
+                sns.scatterplot(data=df, x='Time', y='abundance',
                             hue=hue, style='tipo',
                             palette='gnuplot',
-                            errorbar=lambda x: (x.min(), x.max()),
+                            linewidth=0, s=50, markers={constants.HOTCORE: "d", constants.SHOCK: "P"},
+                            # errorbar=lambda x: (x.min(), x.max()),
                             ax=ax)
                 ax.set_xscale('log')
                 ax.set_yscale('log')
@@ -148,7 +151,8 @@ def abundanceComparison(la_df, focusList, hueList, nameBase, saveFig=True, retur
 
 def abundanceComparisonGrid(imList, ncols, nrows, focusParm, nameBase, saveFig=True, title='CH3OH Abundance Comparison '):
     checkFolders(nameBase)
-    figName= '_'.join([nameBase+constants.ABUNDANCE,focusParm])+'.png'
+    # figName= '_'.join([nameBase+constants.ABUNDANCE,focusParm])+'.png'
+    figName= '_'.join([nameBase+constants.ABUNDANCE,constants.SCATTER,focusParm])+'.png'
 
     fig, axs = plt.subplots(ncols,nrows, figsize=(6*nrows,3*ncols))
     fig.subplots_adjust(top=0.95, hspace=0, wspace=0)
