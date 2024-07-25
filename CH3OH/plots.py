@@ -35,7 +35,7 @@ def localAbundancePlot(m_df, focus, tipo, nameBase, returnFilepaths=False):
         axs.tick_params(axis='x', labelrotation=90)
         fig.legend(ncols=3, loc="upper right", bbox_to_anchor=(0.9, 1))
 
-        fig.suptitle(f"CH3OH Abundance {tipo.upper()}: {focus}={param}")
+        fig.suptitle(f"CH3OH Abundance {tipo.upper()}: {focus}={param}",ha='right')
         fig.savefig(figName, dpi=300, bbox_inches='tight')
         plt.close()
         if returnFilepaths: filePaths.append(figName)
