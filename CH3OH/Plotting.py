@@ -18,6 +18,8 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
 
         df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
         df[species] = df[species][df[species] >= 1e-14]
+        for s in species:
+            df['N_'+s]=df[s]*df['av']*1.6e21
 
         if tipo==constants.HOTCORE:
             max_meth_df = df.loc[df.groupby('runName')['CH3OH'].idxmax()]
@@ -43,6 +45,20 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
     
     return pd.concat(dflist, ignore_index=True)
 
+def boxplotDF(df, species, physical, tipo):
+    campos=['runName','Time','tipo']+physical[tipo]+constants.initparams[tipo]+species+['N_'+s for s in species]
+
+    if tipo==constants.HOTCORE:
+        bxhc=df.loc[df['gasTemp'] == df.groupby('runName')['gasTemp'].transform('max')]
+        bxhc=bxhc.loc[bxhc['Time'] == bxhc.groupby('runName')['Time'].transform('min')]
+        return bxhc[campos]
+    elif tipo==constants.SHOCK:
+        max_temp_df = df.loc[df.groupby('runName')['gasTemp'].idxmax()]
+        merged_df = df.merge(max_temp_df[['runName', 'Time']], on='runName', suffixes=('', '_max_temp'))
+        bxsh = merged_df[(merged_df['Time'] >= merged_df['Time_max_temp'])&(df['gasTemp'] == df.groupby('runName')['gasTemp'].transform('min'))].drop(columns=['Time_max_temp'])
+        bxsh=bxsh[bxsh['Time'] == bxsh.groupby('runName')['Time'].transform('min')]
+        return bxsh[campos]
+
 def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL, singleDf=True):
     if momento == constants.FINAL:
         dfFinal=df.loc[df['normalizedTime'] == 1]
@@ -56,7 +72,7 @@ def localAbundanceDataframe(df, species, physical, tipo, momento=constants.FINAL
     elif momento == constants.ALL:
         dfFinal=df
 
-    campos=['runName','normalizedTime','normalizedTime_log','Time', 'Time_log']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]+physical[tipo]
+    campos=['N_'+s for s in species]+['runName','normalizedTime','normalizedTime_log','Time', 'Time_log']+[f'{prop}_log' for prop in physical[tipo]]+constants.initparams[tipo]+physical[tipo]
     if not singleDf: campos.append('tipo')
     campos=list(set(campos))
 
