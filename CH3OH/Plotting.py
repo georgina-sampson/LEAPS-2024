@@ -18,6 +18,7 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
 
         df = df.loc[:,['Time']+physical[tipo]+species+['runName']]
         df[species] = df[species][df[species] >= 1e-14]
+        
         for s in species:
             df['N_'+s]=df[s]*df['av']*1.6e21
 
