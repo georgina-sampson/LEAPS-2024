@@ -46,15 +46,15 @@ def buildDataframe(tipos, folder, physical, species, singleDf=True):
     
     return pd.concat(dflist, ignore_index=True)
 
-def boxplotDF(df, species, physical, tipo):
+def boxplotDF(df, species, physical, tipo, maxT=True):
     campos=list(set(['runName','Time']+physical[tipo]+constants.initparams[tipo]+species+['N_'+s for s in species]))
+    if tipo==constants.SHOCK: df[constants.SHOCKVEL] = df[constants.SHOCKVEL].astype(str)
 
-    if tipo==constants.HOTCORE:
+    if maxT:
         bxhc=df.loc[df['gasTemp'] == df.groupby('runName')['gasTemp'].transform('max')]
         bxhc=bxhc.loc[bxhc['Time'] == bxhc.groupby('runName')['Time'].transform('min')]
         return bxhc[campos]
     elif tipo==constants.SHOCK:
-        df[constants.SHOCKVEL] = df[constants.SHOCKVEL].astype(str)
         max_temp_df = df.loc[df.groupby('runName')['gasTemp'].idxmax()]
         merged_df = df.merge(max_temp_df[['runName', 'Time']], on='runName', suffixes=('', '_max_temp'))
         bxsh = merged_df[(merged_df['Time'] >= merged_df['Time_max_temp'])&(df['gasTemp'] == df.groupby('runName')['gasTemp'].transform('min'))].drop(columns=['Time_max_temp'])
